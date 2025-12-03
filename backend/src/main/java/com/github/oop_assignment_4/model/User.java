@@ -2,13 +2,16 @@ package com.github.oop_assignment_4.model;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,6 +39,24 @@ public class User implements UserDetails {
 
 	@Column(nullable = false)
 	private String name;
+
+	@OneToMany(mappedBy = "sender", cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private Set<Draft> drafts;
+
+	@OneToMany(mappedBy = "sender", cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private Set<SentMail> sentMails;
+
+	@OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private Set<ReceivedMail> receivedMails;
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<UserFolder> userFolders;
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<Contact> contacts;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
