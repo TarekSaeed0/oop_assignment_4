@@ -2,6 +2,7 @@ package com.github.oop_assignment_4.model;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -21,13 +22,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "sent_mails")
+@Table(name = "mail_datas")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SentMail {
+public class  MailData {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -36,8 +37,11 @@ public class SentMail {
 	@JoinColumn(name = "sender_id", nullable = false)
 	private User sender;
 
-	@OneToMany(mappedBy = "sentMail")
-	private Set<ReceivedMail> receivedMails;
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "mail_data_receivers",
+			joinColumns = @JoinColumn(name = "mail_data_id"),
+			inverseJoinColumns = @JoinColumn(name = "receiver_id"))
+	private Set<User> receivers;
 
 	private String subject;
 
@@ -54,4 +58,8 @@ public class SentMail {
 
 	@Column(nullable = false)
 	private LocalDateTime sentAt;
+
+	@OneToMany(mappedBy = "data", cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private Set<Mail> mails;
 }
