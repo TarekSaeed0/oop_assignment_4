@@ -2,18 +2,8 @@ package com.github.oop_assignment_4.model;
 
 import java.time.LocalDateTime;
 import java.util.Set;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,7 +26,7 @@ public class SentMail {
 	@JoinColumn(name = "sender_id", nullable = false)
 	private User sender;
 
-	@OneToMany(mappedBy = "sentMail")
+	@OneToMany(mappedBy = "sentMail", cascade = CascadeType.ALL)
 	private Set<ReceivedMail> receivedMails;
 
 	private String subject;
