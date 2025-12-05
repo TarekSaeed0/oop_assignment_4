@@ -11,26 +11,26 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "received_mails")
+@Table(name = "mails")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReceivedMail {
+public class Mail {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@JsonIgnore
 	@ManyToOne
-	@JoinColumn(name = "receiver_id", nullable = false)
-	private User receiver;
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 
 	@JsonIgnore
 	@ManyToOne
-	@JoinColumn(name = "sent_mail_id", nullable = false)
-	private SentMail sentMail;
+	@JoinColumn(name = "mail_data_id", nullable = false)
+	private MailData data;
 
 	@JsonIgnore
 	@ManyToOne

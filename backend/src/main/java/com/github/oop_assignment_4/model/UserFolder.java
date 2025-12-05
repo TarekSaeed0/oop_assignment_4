@@ -36,5 +36,5 @@ public class UserFolder {
 	private String name;
 
 	@OneToMany(mappedBy = "userFolder")
-	private Set<ReceivedMail> receivedMails;
+	private Set<Mail> mails;
 }

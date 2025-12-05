@@ -38,13 +38,9 @@ public class User implements UserDetails {
 			orphanRemoval = true)
 	private Set<Draft> drafts;
 
-	@OneToMany(mappedBy = "sender", cascade = CascadeType.ALL,
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
 			orphanRemoval = true)
-	private Set<SentMail> sentMails;
-
-	@OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL,
-			orphanRemoval = true)
-	private Set<ReceivedMail> receivedMails;
+	private Set<Mail> mails;
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<UserFolder> userFolders;
