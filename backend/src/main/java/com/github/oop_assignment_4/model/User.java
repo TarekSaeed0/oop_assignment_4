@@ -4,14 +4,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "users")
@@ -20,6 +17,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(exclude = {"drafts", "mails"})
 public class User implements UserDetails {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,17 +32,21 @@ public class User implements UserDetails {
 	@Column(nullable = false)
 	private String name;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "sender", cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private Set<Draft> drafts;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private Set<Mail> mails;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<UserFolder> userFolders;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Contact> contacts;
 

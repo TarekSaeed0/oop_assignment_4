@@ -22,29 +22,20 @@ public class Mail {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "mail_data_id", nullable = false)
 	private MailData data;
 
-	@JsonIgnore
+
 	@ManyToOne
 	@JoinColumn(name = "user_folder_id")
 	private UserFolder userFolder;
 
 	private LocalDateTime deletedAt;
 
-	private String subject;
 
-	private String body;
-
-	@Column(nullable = false)
-	private Priority priority;
-
-	String senderEmail;
 }

@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmailDto {
+public class MailSendDto {
 	private Long userId;
 	private String body;
 	private String subject;
 	private String[] to;
-	private Priority priority;
+	private String priority ;
 }
