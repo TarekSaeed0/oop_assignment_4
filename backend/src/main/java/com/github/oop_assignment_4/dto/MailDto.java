@@ -7,4 +7,5 @@ import lombok.*;
 @AllArgsConstructor
 public class MailDto {
 	private MailDataDTO data;
+	private Long id;
 }

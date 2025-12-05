@@ -49,6 +49,7 @@ public class MailService {
 					.build();
 			MailDto mailDto = MailDto.builder()
 					.data(mailDataDTO)
+					.id(mail.getId())
 					.build();
 			mailDTOs.add(mailDto);
 		}
