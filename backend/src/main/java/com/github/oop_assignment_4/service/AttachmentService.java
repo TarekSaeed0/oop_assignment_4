@@ -8,9 +8,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import com.github.oop_assignment_4.dto.AttachmentDTO;
 import com.github.oop_assignment_4.exception.AttachmentNotFoundException;
@@ -47,14 +49,13 @@ public class AttachmentService {
 				throw new EmptyAttachmentException();
 			}
 
-			Path path =
-					this.storageLocation.resolve(Paths.get(file.getOriginalFilename()))
-							.normalize().toAbsolutePath();
+			String name = StringUtils.cleanPath(file.getOriginalFilename());
 
-			if (!path.getParent().equals(this.storageLocation.toAbsolutePath())) {
-				throw new AttachmentStorageException(
-						"Cannot store file outside current directory.");
-			}
+			String extension =
+					name.contains(".") ? name.substring(name.lastIndexOf('.')) : "";
+
+			Path path = this.storageLocation
+					.resolve(UUID.randomUUID().toString() + extension);
 
 			try (InputStream inputStream = file.getInputStream()) {
 				Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
