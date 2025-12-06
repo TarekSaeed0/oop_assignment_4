@@ -45,7 +45,7 @@ public class AuthenticationService {
 	public UserDTO signup(SignupRequest signupRequest) {
 		if (userRepository.existsByEmail(signupRequest.getEmail())) {
 			throw new UserAlreadyExistsException(
-					"User with email " + signupRequest.getEmail() + " already exists");
+					signupRequest.getEmail());
 		}
 
 		User user = User.builder().email(signupRequest.getEmail())

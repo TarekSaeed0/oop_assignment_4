@@ -9,6 +9,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
 import { AuthenticationService } from './services/authentication.service';
+import { catchError, of } from 'rxjs';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,7 +19,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     provideAppInitializer(() => {
       const authenticationService = inject(AuthenticationService);
-      return authenticationService.loadUser();
+      return authenticationService.loadUser().pipe(catchError(() => of(null)));
     }),
   ],
 };
