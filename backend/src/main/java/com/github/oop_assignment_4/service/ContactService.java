@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +21,7 @@ public class ContactService {
     private final ContactRepository contactRepository;
     private final UserRepository userRepository;
 
-    public Contact createContact(ContactDTO request) {
+    public ContactDTO createContact(ContactDTO request) {
 
         User owner = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -37,10 +39,17 @@ public class ContactService {
                 .contactUsers(contactUsers)
                 .build();
 
-        return contactRepository.save(contact);
+        Contact savedContact = contactRepository.save(contact);
+
+        return ContactDTO.builder()
+                .userId(savedContact.getId())
+                .name(savedContact.getName())
+                .userId(owner.getId())
+                .contactEmails(contactUsers.stream().map(User::getEmail).collect(Collectors.toSet()))
+                .build();
     }
 
-    public Contact editContact(ContactDTO request) {
+    public ContactDTO editContact(ContactDTO request) {
         Contact existing = contactRepository.findById(request.getContactId())
                 .orElseThrow(() -> new RuntimeException("Contact not found"));
 
@@ -54,14 +63,55 @@ public class ContactService {
 
         existing.setContactUsers(updatedUsers);
 
-        return contactRepository.save(existing);
+        Contact editedContact = contactRepository.save(existing);
+
+        return ContactDTO.builder()
+                .userId(editedContact.getId())
+                .name(editedContact.getName())
+                .userId(existing.getId())
+                .contactEmails(updatedUsers.stream().map(User::getEmail).collect(Collectors.toSet()))
+                .build();
     }
 
 
-    public void deleteContact(ContactDTO request) {
-        Contact contact = contactRepository.findById(request.getContactId())
+    public void deleteContact(Long contactId) {
+        Contact contact = contactRepository.findById(contactId)
                 .orElseThrow(() -> new RuntimeException("Contact not found"));
 
         contactRepository.delete(contact);
     }
+
+    public ContactDTO getContactDTO(Long contactId) {
+        Contact contact = contactRepository.findById(contactId)
+                .orElseThrow(() -> new RuntimeException("Contact not found"));
+
+        return ContactDTO.builder()
+                .contactId(contact.getId())
+                .name(contact.getName())
+                .userId(contact.getUser().getId())
+                .contactEmails(contact.getContactUsers()
+                        .stream()
+                        .map(User::getEmail)
+                        .collect(Collectors.toSet()))
+                .build();
+    }
+
+    public List<ContactDTO> getAllContactsOfUser(Long userId) {
+        // Fetch all contacts where the owner is this user
+        List<Contact> contacts = contactRepository.findByUserId(userId);
+
+        // Convert each contact to ContactDTO
+        return contacts.stream()
+                .map(contact -> ContactDTO.builder()
+                        .contactId(contact.getId())
+                        .name(contact.getName())
+                        .userId(contact.getUser().getId())
+                        .contactEmails(contact.getContactUsers()
+                                .stream()
+                                .map(User::getEmail)
+                                .collect(Collectors.toSet()))
+                        .build())
+                .collect(Collectors.toList());
+    }
+
 }
