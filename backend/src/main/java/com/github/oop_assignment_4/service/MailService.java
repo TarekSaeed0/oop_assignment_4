@@ -106,7 +106,28 @@ public class MailService {
 				.orElseThrow();
 		List<Mail> allMail = mailRepository.findByUserId(inboxRequest.getUserId());
 
-		MailCriterion receivedMailCriterion = new ReceivedMailCriterion(receiver);
+		MailCriterion receivedMailCriterion = new AndCriterion(new NotDeletedCriterion(), new ReceivedMailCriterion(receiver));
+
+		List<Mail> received = receivedMailCriterion.meetsCriterion(allMail);
+
+		List<Mail> filtered = filter(true, received, inboxRequest.getFilterBy(), inboxRequest.getSearchBy(),
+				inboxRequest.getPriority(), inboxRequest.isHasAttachment());
+
+
+		List<Mail> paged = filtered.subList((inboxRequest.getPage() - 1)* inboxRequest.getSize() ,
+				Math.min(filtered.size() ,
+						(inboxRequest.getPage() - 1)* inboxRequest.getSize() + inboxRequest.getSize()
+				)
+		);
+		return toInboxDTO(paged);
+	}
+	@Transactional
+	public List<MailDto> getTrash(InboxRequest inboxRequest) {
+		User receiver = userRepository.findById(inboxRequest.getUserId())
+				.orElseThrow();
+		List<Mail> allMail = mailRepository.findByUserId(inboxRequest.getUserId());
+
+		MailCriterion receivedMailCriterion = new AndCriterion(new DeletedCriterion(), new ReceivedMailCriterion(receiver));
 
 		List<Mail> received = receivedMailCriterion.meetsCriterion(allMail);
 
@@ -160,6 +181,19 @@ public class MailService {
 		// save all
 		mailRepository.saveAll(mails);
 		return "sent";
+	}
+	public MailDto getEmail(Long id) {
+		Mail mail = mailRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("not found"));
+		return toInboxDTO(List.of(mail)).getFirst();
+	}
+
+	public String DeleteById(Long id) {
+		Mail toBeDeleted = mailRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("not found"));
+		toBeDeleted.setDeletedAt(LocalDateTime.now());
+		mailRepository.save(toBeDeleted);
+		return "Deleted";
 	}
 
 

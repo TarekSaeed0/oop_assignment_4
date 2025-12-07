@@ -1,0 +1,24 @@
+@if (currentMailId() != null) {
+<app-mail-inbox [currentMailId]="currentMailId"></app-mail-inbox>
+}
+@else {
+
+  @for (mail of inbox(); track $index) {
+    <div class="flex items-center">
+      <input type="checkbox" [checked]="selectedMail().includes(mail.id)" (change)="handleSelectMail(mail.id)">
+
+      <div class="w-full h-10 mb-0.5 border-0 hover:border"
+      (click)="handleClickEmail(mail.id)"
+      >
+        <div class="flex justify-between">
+          <div class="w-50 pl-10">
+            <span class="mx-auto">{{mail.data.sender.name}}</span>
+          </div>
+          <span class="mx-auto">{{mail.data.subject}}</span>
+
+        </div>
+      </div>
+    </div>
+  }
+
+}
