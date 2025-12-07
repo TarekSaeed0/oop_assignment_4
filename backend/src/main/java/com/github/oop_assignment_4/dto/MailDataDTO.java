@@ -12,6 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class MailDataDTO {
 	private SenderDTO sender;
+	private SenderDTO receiver;
 	private String subject;
 	private String body;
 	private Priority priority;

@@ -30,28 +30,43 @@ public class MailService {
 	private UserRepository userRepository;
 
 
+	public MailDto toMailDto(Mail mail) {
+		User receiver = mail.getUser();
+		MailData mailData = mail.getData();
+		User sender = mail.getData().getSender();
+		SenderDTO receiverDto = SenderDTO.builder()
+				.email(receiver.getEmail())
+				.name(receiver.getName())
+				.build();
+		SenderDTO senderDTO = SenderDTO.builder()
+				.email(sender.getEmail())
+				.name(sender.getName())
+				.build();
+		MailDataDTO mailDataDTO = MailDataDTO.builder()
+				.receiver(receiverDto)
+				.sender(senderDTO)
+				.sentAt(mailData.getSentAt())
+				.subject(mailData.getSubject())
+				.body(mailData.getBody())
+				.attachments(mailData.getAttachments())
+				.priority(mailData.getPriority())
+				.build();
+		return MailDto.builder()
+				.data(mailDataDTO)
+				.id(mail.getId())
+				.build();
+	}
 	public List<MailDto> toInboxDTO(List<Mail> receivedMail) {
 		List<MailDto> mailDTOs = new ArrayList<>();
 		for (Mail mail: receivedMail) {
-			User sender = mail.getData().getSender();
-			MailData mailData = mail.getData();
-			SenderDTO senderDTO = SenderDTO.builder()
-					.email(sender.getEmail())
-					.name(sender.getName())
-					.build();
-			MailDataDTO mailDataDTO = MailDataDTO.builder()
-					.sender(senderDTO)
-					.sentAt(mailData.getSentAt())
-					.subject(mailData.getSubject())
-					.body(mailData.getBody())
-					.attachments(mailData.getAttachments())
-					.priority(mailData.getPriority())
-					.build();
-			MailDto mailDto = MailDto.builder()
-					.data(mailDataDTO)
-					.id(mail.getId())
-					.build();
-			mailDTOs.add(mailDto);
+			mailDTOs.add(toMailDto(mail));
+		}
+		return mailDTOs;
+	}
+	public List<MailDto> toSentDto(List<Mail> receivedMail) {
+		List<MailDto> mailDTOs = new ArrayList<>();
+		for (Mail mail: receivedMail) {
+			mailDTOs.add(toMailDto(mail));
 		}
 		return mailDTOs;
 	}
@@ -80,15 +95,13 @@ public class MailService {
 	}
 	@Transactional
 	public List<MailDto> getSent(InboxRequest inboxRequest) {
-		User receiver = userRepository.findById(inboxRequest.getUserId())
+		User sender = userRepository.findById(inboxRequest.getUserId())
 				.orElseThrow();
-		List<Mail> allMail = mailRepository.findByUserId(inboxRequest.getUserId());
+		List<Mail> all=mailRepository.findByData_Sender_Id(inboxRequest.getUserId());
+		MailCriterion sentCriterion = new SentMailCriterion(sender);
+		List<Mail> sent = sentCriterion.meetsCriterion(all);
 
-		MailCriterion sentMailCriterion = new SentMailCriterion(receiver);
-
-		List<Mail> received = sentMailCriterion.meetsCriterion(allMail);
-
-		List<Mail> filtered = filter(false, received, inboxRequest.getFilterBy(), inboxRequest.getSearchBy(),
+		List<Mail> filtered = filter(false, sent, inboxRequest.getFilterBy(), inboxRequest.getSearchBy(),
 				inboxRequest.getPriority(), inboxRequest.isHasAttachment());
 
 
@@ -97,7 +110,7 @@ public class MailService {
 						(inboxRequest.getPage() - 1)* inboxRequest.getSize() + inboxRequest.getSize()
 				)
 		);
-		return toInboxDTO(paged);
+		return toSentDto(paged);
 	}
 
 	@Transactional
@@ -185,7 +198,7 @@ public class MailService {
 	public MailDto getEmail(Long id) {
 		Mail mail = mailRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("not found"));
-		return toInboxDTO(List.of(mail)).getFirst();
+		return toMailDto(mail);
 	}
 
 	public String DeleteById(Long id) {
@@ -193,6 +206,14 @@ public class MailService {
 				.orElseThrow(() -> new RuntimeException("not found"));
 		toBeDeleted.setDeletedAt(LocalDateTime.now());
 		mailRepository.save(toBeDeleted);
+		return "Deleted";
+	}
+	public String deleteAllById(List<Long> ids) {
+		List<Mail> toBeDeleted = mailRepository.findAllById(ids);
+		for(Mail mail: toBeDeleted) {
+			mail.setDeletedAt(LocalDateTime.now());
+		}
+		mailRepository.saveAll(toBeDeleted);
 		return "Deleted";
 	}
 

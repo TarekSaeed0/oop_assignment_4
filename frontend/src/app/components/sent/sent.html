@@ -1,5 +1,5 @@
 @if (currentMailId() != null) {
-  <app-mail-inbox [currentMailId]="currentMailId"></app-mail-inbox>
+  <app-mail-in-sent [currentMailId]="currentMailId"></app-mail-in-sent>
   }
   @else {
 
@@ -12,7 +12,7 @@
         >
           <div class="flex justify-between">
             <div class="w-50 pl-10">
-              <span class="mx-auto">{{mail.data.sender.name}}</span>
+              <span class="mx-auto">To: {{mail.data.receiver?.name}}</span>
             </div>
             <span class="mx-auto">{{mail.data.subject}}</span>
 

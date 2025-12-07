@@ -54,6 +54,14 @@ export class HomeComponent {
 
   private authenticationService = inject(AuthenticationService);
 
+  searchBy = signal<string>("")
+  handleSearchTyping = (key: any) => {
+  }
+  handleSearchChange(event: any) {
+    this.searchBy.set(event.target.value)
+  }
+  handleSearch = () => {
+  }
   userName() {
     return this.authenticationService.user()?.name.split(' ').slice(0, 2).join(' ');
   }

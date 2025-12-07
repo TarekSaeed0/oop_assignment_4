@@ -29,6 +29,8 @@
         type="search"
         placeholder="Search mail"
         class="w-full pr-4 pl-10 py-2 border border-gray-300 rounded-full outline-none focus:border-green-500 placeholder-gray-500 text-gray-800 transition-colors"
+        (keydown)="handleSearchTyping($event)"
+        (change)="handleSearchChange($event)"
       />
     </div>
 

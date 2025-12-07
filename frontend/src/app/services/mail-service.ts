@@ -33,4 +33,10 @@ export class MailService {
   public getEmail(id: number) {
     return this.http.get(`${this.baseUrl}getEmail/${id}`);
   }
+  public deleteMail(id: number) {
+    return this.http.delete(`${this.baseUrl}deleteEmail/${id}`);
+  }
+  public bulkDelete(ids: number[]) {
+    return this.http.put(`${this.baseUrl}bulkDelete`, ids);
+  }
 }

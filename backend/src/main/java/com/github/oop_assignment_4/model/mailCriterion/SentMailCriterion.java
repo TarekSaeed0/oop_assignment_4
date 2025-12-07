@@ -14,6 +14,6 @@ public class SentMailCriterion extends MailCriterion {
 	}
 	@Override
 	public List<Mail> meetsCriterion(List<Mail> mailList) {
-		return mailList.stream().filter((m) -> m.getData().getSender() == sender).toList();
+		return mailList.stream().filter((m) -> m.getData().getSender() == sender && m.getUser() != sender).toList();
 	}
 }

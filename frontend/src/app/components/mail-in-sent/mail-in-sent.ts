@@ -1,18 +1,18 @@
-import { Component, inject, input, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, inject, input, signal, WritableSignal } from '@angular/core';
+import { AuthenticationService } from '../../services/authentication.service';
 import { MailService } from '../../services/mail-service';
 import { Mail } from '../../types/mail';
-import { CommonModule } from '@angular/common';
-import { AuthenticationService } from '../../services/authentication.service';
 
 @Component({
-  selector: 'app-mail-inbox',
+  selector: 'app-mail-in-sent',
   imports: [],
-  templateUrl: './mail-inbox.html',
-  styleUrl: './mail-inbox.css',
+  templateUrl: './mail-in-sent.html',
+  styleUrl: './mail-in-sent.css',
 })
-export class MailInbox implements OnInit {
+export class MailInSent {
   mailService = inject(MailService);
   authService: undefined | AuthenticationService;
+  mail = signal<Mail | null>(null)
   constructor(authService: AuthenticationService) {
     this.authService = authService;
   }
@@ -26,8 +26,7 @@ export class MailInbox implements OnInit {
   }
 
   currentMailId = input.required<WritableSignal<number | null>>()
-  mail = signal<Mail | null>(null)
-  handleBackToInbox = () => {
+  handleBackToSent = () => {
     this.currentMailId().set(null)
     this.mail.set(null);
   }
@@ -47,23 +46,10 @@ export class MailInbox implements OnInit {
     // TODO: Implement move to folder functionality
   }
 
-  onMarkAsSpam() {
-    // TODO: Implement spam functionality
-  }
 
   onToggleStar() {
     // TODO: Implement star functionality
   }
 
-  onMarkUnread() {
-    // TODO: Implement mark as unread functionality
-  }
-
-  onReply() {
-    // TODO: Implement reply functionality
-  }
-
-  onForward() {
-    // TODO: Implement forward functionality
-  }
 }
+

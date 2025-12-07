@@ -3,10 +3,11 @@ import { MailService } from '../../services/mail-service';
 import { MailResponce } from '../../types/mail';
 import { MailInbox } from "../mail-inbox/mail-inbox";
 import { AuthenticationService } from '../../services/authentication.service';
+import { MailInSent } from "../mail-in-sent/mail-in-sent";
 
 @Component({
   selector: 'app-sent',
-  imports: [MailInbox],
+  imports: [MailInbox, MailInSent],
   templateUrl: './sent.html',
   styleUrl: './sent.css',
 })
@@ -17,7 +18,7 @@ export class Sent {
     this.authService = authSevice
     effect(() => {
       if (this.currentMailId() == null) {
-        this.mailSerivce.getSent(2, this.page(), this.size(), "", "", false, "any").subscribe({
+        this.mailSerivce.getSent(authSevice.user()?.id as number, this.page(), this.size(), "", "", false, "any").subscribe({
           next: (d: any) => {
             console.log(d);
             this.sent.set(d);

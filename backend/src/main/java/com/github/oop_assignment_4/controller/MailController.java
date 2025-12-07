@@ -5,6 +5,7 @@ import com.github.oop_assignment_4.dto.InboxRequest;
 import com.github.oop_assignment_4.dto.MailDto;
 import com.github.oop_assignment_4.service.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,6 +39,11 @@ public class MailController {
 	}
 	@DeleteMapping("deleteEmail/{id}")
 	String deleteEmail(@PathVariable Long id) {
+		System.out.println(id);
 		return mailService.DeleteById(id);
+	}
+	@PutMapping("bulkDelete")
+	public void deleteAllById(@RequestBody List<Long> ids) {
+		mailService.deleteAllById(ids);
 	}
 }
