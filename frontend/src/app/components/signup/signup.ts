@@ -11,9 +11,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './signup.css',
 })
 export class Signup {
-  private authenticationService = inject(AuthenticationService);
   private formBuilder = inject(FormBuilder);
-  private router = inject(Router);
 
   form = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -23,11 +21,14 @@ export class Signup {
 
   showPassword = false;
 
-  error = null;
-
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
+
+  private authenticationService = inject(AuthenticationService);
+  private router = inject(Router);
+
+  error = null;
 
   onSubmit() {
     this.error = null;
