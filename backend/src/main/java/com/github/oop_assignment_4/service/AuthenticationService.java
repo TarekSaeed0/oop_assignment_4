@@ -45,7 +45,7 @@ public class AuthenticationService {
 	public UserDTO signup(SignupRequest signupRequest) {
 		if (userRepository.existsByEmail(signupRequest.getEmail())) {
 			throw new UserAlreadyExistsException(
-					"User with email " + signupRequest.getEmail() + " already exists");
+					signupRequest.getEmail());
 		}
 
 		User user = User.builder().email(signupRequest.getEmail())
@@ -55,7 +55,7 @@ public class AuthenticationService {
 		return userMapper.toDTO(userRepository.save(user));
 	}
 
-	public void signin(SigninRequest signinRequest, HttpServletRequest request,
+	public UserDTO signin(SigninRequest signinRequest, HttpServletRequest request,
 			HttpServletResponse response) {
 		UsernamePasswordAuthenticationToken token =
 				new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),
@@ -67,6 +67,8 @@ public class AuthenticationService {
 		context.setAuthentication(authentication);
 		securityContextHolderStrategy.setContext(context);
 		securityContextRepository.saveContext(context, request, response);
+
+		return me(authentication);
 	}
 
 	public UserDTO me(Authentication authentication) {
