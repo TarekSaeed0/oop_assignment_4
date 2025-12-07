@@ -31,8 +31,8 @@ public class AuthenticationController {
 		return ResponseEntity.ok(authenticationService.signup(request));
 	}
 
-	@PostMapping("/signin")
-	public ResponseEntity<UserDTO> signin(
+	@PostMapping({"/signin", "/login"})
+	public ResponseEntity<Void> signin(
 			@Valid @RequestBody SigninRequest signinRequest,
 			HttpServletRequest request, HttpServletResponse response) {
 		return ResponseEntity.ok(authenticationService.signin(signinRequest, request, response));
