@@ -27,10 +27,9 @@ public class AuthenticationService {
 	private final PasswordEncoder passwordEncoder;
 	private final UserRepository userRepository;
 	private final UserMapper userMapper;
-	private SecurityContextRepository securityContextRepository =
-			new HttpSessionSecurityContextRepository();
-	private final SecurityContextHolderStrategy securityContextHolderStrategy =
-			SecurityContextHolder.getContextHolderStrategy();
+	private SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
+	private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder
+			.getContextHolderStrategy();
 
 	public AuthenticationService(AuthenticationManager authenticationManager,
 			PasswordEncoder passwordEncoder, UserRepository userRepository,
@@ -41,7 +40,6 @@ public class AuthenticationService {
 		this.userMapper = userMapper;
 	}
 
-	@Transactional
 	public UserDTO signup(SignupRequest signupRequest) {
 		if (userRepository.existsByEmail(signupRequest.getEmail())) {
 			throw new UserAlreadyExistsException(
@@ -57,13 +55,11 @@ public class AuthenticationService {
 
 	public UserDTO signin(SigninRequest signinRequest, HttpServletRequest request,
 			HttpServletResponse response) {
-		UsernamePasswordAuthenticationToken token =
-				new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),
-						signinRequest.getPassword());
+		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),
+				signinRequest.getPassword());
 		Authentication authentication = authenticationManager.authenticate(token);
 
-		SecurityContext context =
-				securityContextHolderStrategy.createEmptyContext();
+		SecurityContext context = securityContextHolderStrategy.createEmptyContext();
 		context.setAuthentication(authentication);
 		securityContextHolderStrategy.setContext(context);
 		securityContextRepository.saveContext(context, request, response);
