@@ -40,10 +40,12 @@ public class SecurityConfiguration {
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http.csrf(csrf -> csrf.disable())
 				.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-				.authorizeHttpRequests(
-						auth -> auth.requestMatchers("/api/auth/signup", "/api/auth/signin")
-								.permitAll().requestMatchers("/h2-console/**").permitAll()
-								.anyRequest().authenticated())
+//				.authorizeHttpRequests(
+//						auth -> auth.requestMatchers("/api/auth/signup", "/api/auth/signin")
+//								.permitAll().requestMatchers("/h2-console/**").permitAll()
+//								.anyRequest().authenticated())
+				.authorizeHttpRequests(auth -> auth
+						.anyRequest().permitAll())
 				.headers(headers -> headers
 						.frameOptions(frameOptions -> frameOptions.sameOrigin()))
 				.sessionManagement(session -> session
