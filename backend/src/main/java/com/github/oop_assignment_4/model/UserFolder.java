@@ -1,5 +1,6 @@
 package com.github.oop_assignment_4.model;
 
+import java.util.HashSet;
 import java.util.Set;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,7 +35,7 @@ public class UserFolder {
 
 	@Column(nullable = false)
 	private String name;
-
 	@OneToMany(mappedBy = "userFolder")
-	private Set<Mail> mails;
+	@Builder.Default
+	private Set<Mail> mails = new HashSet<>();
 }
