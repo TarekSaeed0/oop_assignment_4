@@ -1,14 +1,20 @@
-import { Component, HostListener, inject } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../services/authentication.service';
+import { Inbox } from "../inbox/inbox";
+import { Sent } from "../sent/sent";
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink],
+  imports: [RouterLink, Inbox, Sent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
 export class HomeComponent {
+  folder = signal<"Inbox" | "Sent" | "Drafts" | "Trash" | number | string>("Inbox");
+  changeFolder = (folderName: string) => {
+    this.folder.set(folderName)
+  }
   folders = [
     {
       name: 'Inbox',

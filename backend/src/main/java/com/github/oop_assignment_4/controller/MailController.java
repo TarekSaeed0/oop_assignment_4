@@ -5,14 +5,12 @@ import com.github.oop_assignment_4.dto.InboxRequest;
 import com.github.oop_assignment_4.dto.MailDto;
 import com.github.oop_assignment_4.service.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-
+@CrossOrigin(origins = "*")
 public class MailController {
 
 	@Autowired
@@ -29,5 +27,17 @@ public class MailController {
 	@PostMapping("sent")
 	List<MailDto> getSent(@RequestBody InboxRequest inboxRequest) {
 		return mailService.getSent(inboxRequest);
+	}
+	@PostMapping("trash")
+	List<MailDto> getTrash(@RequestBody InboxRequest inboxRequest) {
+		return mailService.getSent(inboxRequest);
+	}
+	@GetMapping("getEmail/{id}")
+	MailDto getEmail(@PathVariable Long id) {
+		return mailService.getEmail(id);
+	}
+	@DeleteMapping("deleteEmail/{id}")
+	String deleteEmail(@PathVariable Long id) {
+		return mailService.DeleteById(id);
 	}
 }

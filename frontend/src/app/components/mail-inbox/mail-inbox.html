@@ -1,0 +1,7 @@
+<button (click)="handleBackToInbox()">back</button>
+<div>
+  <h3>sender name: {{mail()?.data?.sender?.name}}</h3>
+  <h3>sender email: {{mail()?.data?.sender?.email}}</h3>
+  <h3>Subject: {{mail()?.data?.subject}}</h3>
+  <div>Body: {{mail()?.data?.body}}</div>
+</div>
