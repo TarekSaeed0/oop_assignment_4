@@ -32,11 +32,10 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/signin")
-	public ResponseEntity<Void> signin(
+	public ResponseEntity<UserDTO> signin(
 			@Valid @RequestBody SigninRequest signinRequest,
 			HttpServletRequest request, HttpServletResponse response) {
-		authenticationService.signin(signinRequest, request, response);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(authenticationService.signin(signinRequest, request, response));
 	}
 
 	@GetMapping("/me")
