@@ -12,8 +12,12 @@ public class InboxRequest {
 	@NotNull
 	private int size;
 	@NotNull
-	private String sortBy;
+	private String searchBy;
 	@NotNull
 	private String filterBy;
+	@NotNull
+	private String priority;
+	@NotNull
+	private boolean hasAttachment;
 
 }
