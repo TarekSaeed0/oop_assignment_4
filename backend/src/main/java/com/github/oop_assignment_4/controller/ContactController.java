@@ -45,6 +45,7 @@ public class ContactController {
         return ResponseEntity.ok(contactDTO);
     }
 
+    // to fetch a contacts of specific User by his ID
     @GetMapping("/user/{userId}/contacts")
     public ResponseEntity<List<ContactDTO>> getAllContactsOfUser(@PathVariable Long userId) {
         List<ContactDTO> contacts = contactService.getAllContactsOfUser(userId);
