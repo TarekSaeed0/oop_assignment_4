@@ -3,10 +3,11 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../services/authentication.service';
 import { Inbox } from "../inbox/inbox";
 import { Sent } from "../sent/sent";
+import { Contact } from '../contact/contact';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, Inbox, Sent],
+  imports: [RouterLink, Inbox, Sent, Contact],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
@@ -81,4 +82,12 @@ export class HomeComponent {
   signOut() {
     this.authenticationService.signout().subscribe(() => this.router.navigateByUrl('/signin'));
   }
+
+  //! -------------------- Contact Menu ------------------
+  isContactMenuOpen = false;
+
+  toggleContactMenu() {
+    this.isContactMenuOpen = !this.isContactMenuOpen;
+  }
+
 }

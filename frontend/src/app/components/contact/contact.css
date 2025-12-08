@@ -1,0 +1,115 @@
+/* Main container styling */
+.container {
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 25px;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #00c950;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+  font-family: Arial, sans-serif;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Headings */
+h2, h3 {
+  color: #00c950;
+  margin-bottom: 15px;
+}
+
+/* Form styling */
+.form {
+  margin-bottom: 25px;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+  color: #00c950;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 8px;
+  border: 2px solid #00c950;
+  outline: none;
+  transition: 0.2s;
+}
+
+input[type="text"]:focus {
+  box-shadow: 0 0 8px #00c950;
+}
+
+/* Buttons */
+button {
+  background: #00c950;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  margin-top: 10px;
+  margin-right: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: bold;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+/* Email tags */
+span {
+  display: inline-flex;
+  align-items: center;
+  background: #00c950;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 15px;
+  margin-right: 5px;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+span button {
+  background: white;
+  color: #00c950;
+  margin-left: 6px;
+  padding: 2px 5px;
+  font-size: 10px;
+  border-radius: 50%;
+}
+
+span button:hover {
+  background: #e6ffe6;
+}
+
+/* Contact card */
+.contact-card {
+  padding: 15px;
+  border: 2px solid #00c950;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  background: white;
+}
+
+.contact-card b {
+  color: #00c950;
+  font-size: 18px;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #00c95044;
+  margin: 20px 0;
+}
