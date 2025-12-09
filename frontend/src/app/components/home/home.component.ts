@@ -13,10 +13,10 @@ import { UserFolder, UserFolderService } from '../../services/UserFolderService'
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
-export class HomeComponent implements OnInit {
-  folder = signal<"Inbox" | "Sent" | "Drafts" | "Trash" | number | string>("Inbox");
+export class HomeComponent {
+  selectedFolder = signal<"Inbox" | "Sent" | "Drafts" | "Trash" | number | string>("Inbox");
   changeFolder = (folderName: string) => {
-    this.folder.set(folderName)
+    this.selectedFolder.set(folderName)
   }
   folders = [
     {
@@ -95,6 +95,14 @@ private userFolderService = inject(UserFolderService);
 
   private authenticationService = inject(AuthenticationService);
 
+  searchBy = signal<string>("")
+  handleSearchTyping = (key: any) => {
+  }
+  handleSearchChange(event: any) {
+    this.searchBy.set(event.target.value)
+  }
+  handleSearch = () => {
+  }
   userName() {
     return this.authenticationService.user()?.name.split(' ').slice(0, 2).join(' ');
   }

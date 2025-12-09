@@ -14,6 +14,8 @@ public class InboxRequest {
 	@NotNull
 	private String searchBy;
 	@NotNull
+	private String sortBy;
+	@NotNull
 	private String filterBy;
 	@NotNull
 	private String priority;

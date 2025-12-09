@@ -2,10 +2,7 @@ package com.github.oop_assignment_4.service;
 
 import com.github.oop_assignment_4.dto.*;
 
-import com.github.oop_assignment_4.model.Mail;
-import com.github.oop_assignment_4.model.MailData;
-import com.github.oop_assignment_4.model.Priority;
-import com.github.oop_assignment_4.model.User;
+import com.github.oop_assignment_4.model.*;
 import com.github.oop_assignment_4.model.mailCriterion.*;
 import com.github.oop_assignment_4.repository.DraftRepository;
 import com.github.oop_assignment_4.repository.MailDataRepository;
@@ -30,30 +27,46 @@ public class MailService {
 	private UserRepository userRepository;
 
 
-	public List<MailDto> toInboxDTO(List<Mail> receivedMail) {
-		List<MailDto> mailDTOs = new ArrayList<>();
+	public InboxMailDTO toInboxMailDto(Mail mail) {
+		User receiver = mail.getUser();
+		MailData mailData = mail.getData();
+		User sender = mail.getData().getSender();
+		SenderDTO receiverDto = SenderDTO.builder()
+				.email(receiver.getEmail())
+				.name(receiver.getName())
+				.build();
+		SenderDTO senderDTO = SenderDTO.builder()
+				.email(sender.getEmail())
+				.name(sender.getName())
+				.build();
+		ReceivedMailDataDTO receivedMailDataDTO = ReceivedMailDataDTO.builder()
+				.receiver(receiverDto)
+				.sender(senderDTO)
+				.sentAt(mailData.getSentAt())
+				.subject(mailData.getSubject())
+				.body(mailData.getBody())
+				.attachments(mailData.getAttachments())
+				.priority(mailData.getPriority())
+				.build();
+		return InboxMailDTO.builder()
+				.data(receivedMailDataDTO)
+				.id(mail.getId())
+				.build();
+	}
+
+	public List<InboxMailDTO> toInboxDTO(List<Mail> receivedMail) {
+		List<InboxMailDTO> inboxMailDTOS = new ArrayList<>();
 		for (Mail mail: receivedMail) {
-			User sender = mail.getData().getSender();
-			MailData mailData = mail.getData();
-			SenderDTO senderDTO = SenderDTO.builder()
-					.email(sender.getEmail())
-					.name(sender.getName())
-					.build();
-			MailDataDTO mailDataDTO = MailDataDTO.builder()
-					.sender(senderDTO)
-					.sentAt(mailData.getSentAt())
-					.subject(mailData.getSubject())
-					.body(mailData.getBody())
-					.attachments(mailData.getAttachments())
-					.priority(mailData.getPriority())
-					.build();
-			MailDto mailDto = MailDto.builder()
-					.data(mailDataDTO)
-					.id(mail.getId())
-					.build();
-			mailDTOs.add(mailDto);
+			inboxMailDTOS.add(toInboxMailDto(mail));
 		}
-		return mailDTOs;
+		return inboxMailDTOS;
+	}
+	public List<SentMailDTO> toSentDto(List<Mail> receivedMail) {
+		List<SentMailDTO> inboxMailDTOS = new ArrayList<>();
+		for (Mail mail: receivedMail) {
+			inboxMailDTOS.add(toSentMailDto(mail));
+		}
+		return inboxMailDTOS;
 	}
 	List<Mail> filter(boolean inbox, List<Mail> mailList, String filterBy, String searchBy, String priority, boolean hasAttachment) {
 		MailCriterion criterion = (inbox? new GeneralSearchCriterionForInbox(searchBy):
@@ -79,29 +92,84 @@ public class MailService {
 		return criterion.meetsCriterion(mailList);
 	}
 	@Transactional
-	public List<MailDto> getSent(InboxRequest inboxRequest) {
-		User receiver = userRepository.findById(inboxRequest.getUserId())
+	public List<InboxMailDTO> getSent(InboxRequest inboxRequest) {
+		User sender = userRepository.findById(inboxRequest.getUserId())
 				.orElseThrow();
-		List<Mail> allMail = mailRepository.findByUserId(inboxRequest.getUserId());
+		List<Mail> all=mailRepository.findByData_Sender_Id(inboxRequest.getUserId());
 
-		MailCriterion sentMailCriterion = new SentMailCriterion(receiver);
+		MailCriterion sentCriterion = new SentMailCriterion(sender);
+		List<Mail> sent = sentCriterion.meetsCriterion(all);
 
-		List<Mail> received = sentMailCriterion.meetsCriterion(allMail);
-
-		List<Mail> filtered = filter(false, received, inboxRequest.getFilterBy(), inboxRequest.getSearchBy(),
+		List<Mail> filtered = filter(false, sent, inboxRequest.getFilterBy(), inboxRequest.getSearchBy(),
 				inboxRequest.getPriority(), inboxRequest.isHasAttachment());
 
+		List<InboxMailDTO> inboxMailDTOS = toInboxDTO(filtered);
 
-		List<Mail> paged = filtered.subList((inboxRequest.getPage() - 1)* inboxRequest.getSize() ,
-				Math.min(filtered.size() ,
-						(inboxRequest.getPage() - 1)* inboxRequest.getSize() + inboxRequest.getSize()
+
+		return inboxMailDTOS.subList((inboxRequest.getPage() - 1)* inboxRequest.getSize() ,
+				Math.min(inboxMailDTOS.size() ,
+						(inboxRequest.getPage())* inboxRequest.getSize()
 				)
 		);
-		return toInboxDTO(paged);
+	}
+	@Transactional
+	public List<SentMailDTO> getSentV2(InboxRequest inboxRequest) {
+		User sender = userRepository.findById(inboxRequest.getUserId())
+				.orElseThrow();
+		List<Mail> senderCopy =mailRepository.findByUserAndData_Sender(sender, sender);
+		MailCriterion sentCriterion = new AndCriterion(new SentMailCriterion(sender), new NotDeletedCriterion()) ;
+		List<Mail> sent = sentCriterion.meetsCriterion(senderCopy);
+
+		List<Mail> filtered = filter(false, sent, inboxRequest.getFilterBy(), inboxRequest.getSearchBy(),
+				inboxRequest.getPriority(), inboxRequest.isHasAttachment());
+		//todo: sort
+
+		List<SentMailDTO> inboxMailDTOS = toSentDto(filtered);
+
+
+		return inboxMailDTOS.subList((inboxRequest.getPage() - 1)* inboxRequest.getSize() ,
+				Math.min(inboxMailDTOS.size() ,
+						(inboxRequest.getPage())* inboxRequest.getSize()
+				)
+		);
+	}
+	public SentMailDTO toSentMailDto(Mail mail) {
+		User sender = mail.getUser();
+		MailData mailData = mail.getData();
+
+		Set<Mail> allMails = mailData.getMails();
+		List<SenderDTO> receiversDTOs = new ArrayList<>();
+		for(Mail copy: allMails) {
+			if(copy == mail) continue;
+			User receiverUser = copy.getUser();
+			SenderDTO receiverDTO = SenderDTO.builder()
+					.name(receiverUser.getName())
+					.email(receiverUser.getEmail())
+					.build();
+			receiversDTOs.add(receiverDTO);
+		}
+
+		SenderDTO senderDTO = SenderDTO.builder()
+				.email(sender.getEmail())
+				.name(sender.getName())
+				.build();
+		SentMailDataDTO sentMailDataDTO = SentMailDataDTO.builder()
+				.receivers(receiversDTOs)
+				.sender(senderDTO)
+				.sentAt(mailData.getSentAt())
+				.subject(mailData.getSubject())
+				.body(mailData.getBody())
+				.attachments(mailData.getAttachments())
+				.priority(mailData.getPriority())
+				.build();
+		return SentMailDTO.builder()
+				.id(mail.getId())
+				.data(sentMailDataDTO)
+				.build();
 	}
 
 	@Transactional
-	public List<MailDto> getInbox(InboxRequest inboxRequest) {
+	public List<InboxMailDTO> getInbox(InboxRequest inboxRequest) {
 		User receiver = userRepository.findById(inboxRequest.getUserId())
 				.orElseThrow();
 		List<Mail> allMail = mailRepository.findByUserId(inboxRequest.getUserId());
@@ -109,20 +177,22 @@ public class MailService {
 		MailCriterion receivedMailCriterion = new AndCriterion(new NotDeletedCriterion(), new ReceivedMailCriterion(receiver));
 
 		List<Mail> received = receivedMailCriterion.meetsCriterion(allMail);
-
 		List<Mail> filtered = filter(true, received, inboxRequest.getFilterBy(), inboxRequest.getSearchBy(),
 				inboxRequest.getPriority(), inboxRequest.isHasAttachment());
+		// sorting
+		MailComparatorFactory mcf = new MailComparatorFactory();
+		filtered.sort(mcf.getComparator(inboxRequest.getSortBy()));
 
+		List<InboxMailDTO> inboxMailDTOS = toInboxDTO(filtered);
 
-		List<Mail> paged = filtered.subList((inboxRequest.getPage() - 1)* inboxRequest.getSize() ,
-				Math.min(filtered.size() ,
-						(inboxRequest.getPage() - 1)* inboxRequest.getSize() + inboxRequest.getSize()
+		return inboxMailDTOS.subList((inboxRequest.getPage() - 1)* inboxRequest.getSize() ,
+				Math.min(inboxMailDTOS.size() ,
+						(inboxRequest.getPage())* inboxRequest.getSize()
 				)
 		);
-		return toInboxDTO(paged);
 	}
 	@Transactional
-	public List<MailDto> getTrash(InboxRequest inboxRequest) {
+	public List<InboxMailDTO> getTrash(InboxRequest inboxRequest) {
 		User receiver = userRepository.findById(inboxRequest.getUserId())
 				.orElseThrow();
 		List<Mail> allMail = mailRepository.findByUserId(inboxRequest.getUserId());
@@ -133,7 +203,7 @@ public class MailService {
 
 		List<Mail> filtered = filter(true, received, inboxRequest.getFilterBy(), inboxRequest.getSearchBy(),
 				inboxRequest.getPriority(), inboxRequest.isHasAttachment());
-
+//		List<Mail> sorted = Arrays.sort(filtered, new <Mail>());
 
 		List<Mail> paged = filtered.subList((inboxRequest.getPage() - 1)* inboxRequest.getSize() ,
 				Math.min(filtered.size() ,
@@ -160,6 +230,7 @@ public class MailService {
 		}
 		System.out.println("receivers = " + receivers);
 		// todo: add attachments
+
 		mailData.setReceivers(receivers);
 		mailData.setSentAt(LocalDateTime.now());
 		mailDataRepository.save(mailData);
@@ -182,18 +253,33 @@ public class MailService {
 		mailRepository.saveAll(mails);
 		return "sent";
 	}
-	public MailDto getEmail(Long id) {
+	@Transactional
+	public InboxMailDTO getInboxEmail(Long id) {
 		Mail mail = mailRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("not found"));
-		return toInboxDTO(List.of(mail)).getFirst();
+
+		return toInboxMailDto(mail);
+	}
+	@Transactional
+	public SentMailDTO getSentEmail(Long id) {
+		Mail mail = mailRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("not found"));
+
+		return toSentMailDto(mail);
 	}
 
-	public String DeleteById(Long id) {
+	public void DeleteById(Long id) {
 		Mail toBeDeleted = mailRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("not found"));
 		toBeDeleted.setDeletedAt(LocalDateTime.now());
 		mailRepository.save(toBeDeleted);
-		return "Deleted";
+	}
+	public void deleteAllById(List<Long> ids) {
+		List<Mail> toBeDeleted = mailRepository.findAllById(ids);
+		for(Mail mail: toBeDeleted) {
+			mail.setDeletedAt(LocalDateTime.now());
+		}
+		mailRepository.saveAll(toBeDeleted);
 	}
 
 

@@ -7,7 +7,6 @@ import java.util.List;
 public class DeletedCriterion extends MailCriterion{
 	@Override
 	public List<Mail> meetsCriterion(List<Mail> mailList) {
-
 		return mailList.stream().filter((m) -> m.getDeletedAt() != null).toList();
 	}
 }

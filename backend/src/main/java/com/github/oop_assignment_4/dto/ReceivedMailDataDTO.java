@@ -10,8 +10,9 @@ import java.util.Set;
 @Data
 @Builder
 @AllArgsConstructor
-public class MailDataDTO {
+public class ReceivedMailDataDTO {
 	private SenderDTO sender;
+	private SenderDTO receiver;
 	private String subject;
 	private String body;
 	private Priority priority;

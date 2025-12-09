@@ -4,11 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-@AllArgsConstructor
 @Builder
-public class InboxDTO {
-	List<MailDto> receivedMail;
+@AllArgsConstructor
+public class SentMailDTO {
+	private SentMailDataDTO data;
+	private Long id;
 }
