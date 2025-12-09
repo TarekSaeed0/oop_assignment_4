@@ -5,7 +5,7 @@ import lombok.*;
 @Data
 @Builder
 @AllArgsConstructor
-public class MailDto {
-	private MailDataDTO data;
+public class InboxMailDTO {
+	private ReceivedMailDataDTO data;
 	private Long id;
 }

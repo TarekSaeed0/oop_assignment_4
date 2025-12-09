@@ -9,7 +9,7 @@ import java.util.List;
 public class PriorityCriterion extends MailCriterion{
 	Priority priority;
 	public PriorityCriterion(String priority) {
-		this.priority = Priority.valueOf(priority);
+		this.priority = Priority.valueOf(priority.toUpperCase());
 	}
 	@Override
 	public List<Mail> meetsCriterion(List<Mail> mailList) {

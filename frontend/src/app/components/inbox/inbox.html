@@ -4,8 +4,9 @@
 @else {
   <div class="min-h-screen bg-gray-50">
     <!-- Toolbar -->
-    <div class="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-2">
-      <div class="flex items-center justify-between">
+    <div class="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3">
+      <!-- Top Row: Checkbox, Refresh, Bulk Actions, Pagination -->
+      <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-4">
           <!-- Select All Checkbox -->
           <input
@@ -26,26 +27,25 @@
           @if (selectedMail().length > 0) {
             <div class="flex items-center gap-2 pl-2 border-l border-gray-300">
               <button
-                class="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                class="p-2 hover:bg-red-50 rounded-full transition-colors group"
                 (click)="handleBulkDelete()"
                 title="Delete"
               >
-                <span>🗑️</span>
+                <span class="group-hover:scale-110 transition-transform inline-block">🗑️</span>
               </button>
               <button
-                class="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                class="p-2 hover:bg-blue-50 rounded-full transition-colors group"
                 (click)="handleBulkMove()"
                 title="Move to folder"
               >
-                <span>📁</span>
+                <span class="group-hover:scale-110 transition-transform inline-block">📁</span>
               </button>
-
             </div>
           }
         </div>
         <!-- Pagination Info -->
         <div class="flex items-center gap-2 text-sm text-gray-600">
-          <span>{{getPageInfo()}}</span>
+          <span>Page {{page()}}</span>
           <button
             class="p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             (click)="handlePrevPage()"
@@ -61,6 +61,81 @@
             ▶
           </button>
         </div>
+      </div>
+
+      <!-- Bottom Row: Filters -->
+      <div class="flex items-center gap-4 flex-wrap">
+        <!-- Filter By Select -->
+        <div class="flex items-center gap-2">
+          <label class="text-sm text-gray-600 font-medium">Filter:</label>
+          <select
+            class="px-3 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer"
+            [value]="filterBy()"
+            (change)="handleFilterChange($event)"
+          >
+            <option value="any">Any</option>
+            <option value="name">Name</option>
+            <option value="email">Email</option>
+            <option value="subject">Subject</option>
+            <option value="body">Body</option>
+          </select>
+        </div>
+
+        <!-- Sort By Select -->
+        <div class="flex items-center gap-2">
+          <label class="text-sm text-gray-600 font-medium">Sort:</label>
+          <select
+            class="px-3 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer"
+            [value]="sortBy()"
+            (change)="handleSortChange($event)"
+          >
+            <option value="date">Date</option>
+            <option value="sender">Sender</option>
+            <option value="subject">Subject</option>
+            <option value="priority">Priority</option>
+          </select>
+        </div>
+
+        <!-- Priority Filter -->
+        <div class="flex items-center gap-2">
+          <label class="text-sm text-gray-600 font-medium">Priority:</label>
+          <select
+            class="px-3 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer"
+            [value]="priority()"
+            (change)="handlePriorityChange($event)"
+          >
+            <option value="any">Any</option>
+            <option value="URGENT">Urgent</option>
+            <option value="HIGH">High</option>
+            <option value="NORMAL">Normal</option>
+            <option value="LOW">Low</option>
+          </select>
+        </div>
+
+        <!-- Has Attachments Toggle -->
+        <label class="flex items-center gap-2 cursor-pointer select-none group">
+          <div class="relative">
+            <input
+              type="checkbox"
+              class="sr-only peer"
+              [checked]="hasAttachments()"
+              (change)="handleAttchmentToggle($event)"
+            >
+            <div class="w-11 h-6 bg-gray-200 rounded-full peer-focus:ring-2 peer-focus:ring-blue-500 peer-checked:bg-blue-600 transition-colors"></div>
+            <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-5"></div>
+          </div>
+          <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors flex items-center gap-1">
+            <span>📎</span> Attachments only
+          </span>
+        </label>
+
+        <!-- Apply Filters Button -->
+        <button
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+          (click)="handleRefresh()"
+        >
+          Apply
+        </button>
       </div>
     </div>
 
@@ -91,13 +166,13 @@
           >
             <!-- Sender Avatar -->
             <div class="w-8 h-8 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium shrink-0 mr-3">
-              {{mail.data.sender?.name?.charAt(0)?.toUpperCase()}}
+              {{mail.data.sender.name.charAt(0).toUpperCase()}}
             </div>
 
             <!-- Sender Name -->
             <div class="w-48 shrink-0 pr-4">
-              <span class="font-medium text-gray-900 truncate block">
-                {{mail.data.sender?.name}}
+              <span class="font-medium text-gray-900 truncate block" >
+                {{mail.data.sender.name}}
               </span>
             </div>
 
@@ -107,7 +182,7 @@
                 {{mail.data.subject}}
               </span>
               <span class="text-gray-500 truncate text-sm hidden md:inline">
-                - {{mail.data.body.slice(0, 50)}}{{mail.data.body.length > 60 ? '...' : ''}}
+                - {{mail.data.body | slice:0:60}}{{mail.data.body.length > 60 ? '...' : ''}}
               </span>
             </div>
 
@@ -115,27 +190,19 @@
             @if (mail.data.priority) {
               <span
                 class="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium mx-3"
-                [class.bg-red-100]="mail.data.priority  === ('HIGH')"
-                [class.text-red-700]="mail.data.priority === 'HIGH'"
+                [class.bg-red-100]="mail.data.priority === 'HIGH'"
                 [class.bg-yellow-100]="mail.data.priority === 'MEDIUM'"
-                [class.text-yellow-700]="mail.data.priority === 'MEDIUM'"
-                [class.bg-green-100]="mail.data.priority === 'LOW'"
                 [class.text-green-700]="mail.data.priority === 'LOW'"
               >
                 {{mail.data.priority}}
               </span>
             }
 
-            <!-- Attachment Icon -->
-            <!-- @if (mail.data.attachments?.length > 0) {
-              <span class="shrink-0 text-gray-400 mr-3" title="Has attachments">
-                📎
-              </span>
-            } -->
+
 
             <!-- Date -->
-            <div class="shrink-0 text-sm text-gray-500 w-fit text-right">
-              {{mail.data.sentAt | date: 'fullDate' }}
+            <div class="shrink-0 text-sm text-gray-500 w-24 text-right">
+              {{mail.data.sentAt | date:'MMM d'}}
             </div>
           </div>
 

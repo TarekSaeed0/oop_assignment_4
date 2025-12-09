@@ -1,7 +1,7 @@
 import { Component, inject, input, signal, WritableSignal } from '@angular/core';
 import { AuthenticationService } from '../../services/authentication.service';
 import { MailService } from '../../services/mail-service';
-import { Mail } from '../../types/mail';
+import { InboxMail, SentMail } from '../../types/mail';
 
 @Component({
   selector: 'app-mail-in-sent',
@@ -12,12 +12,12 @@ import { Mail } from '../../types/mail';
 export class MailInSent {
   mailService = inject(MailService);
   authService: undefined | AuthenticationService;
-  mail = signal<Mail | null>(null)
+  mail = signal<SentMail | null>(null)
   constructor(authService: AuthenticationService) {
     this.authService = authService;
   }
   ngOnInit(): void {
-    this.mailService.getEmail(this.currentMailId()() as number).subscribe({
+    this.mailService.getSentEmail(this.currentMailId()() as number).subscribe({
       next: (d: any) => {
         console.log(d);
         this.mail.set(d);
@@ -47,9 +47,6 @@ export class MailInSent {
   }
 
 
-  onToggleStar() {
-    // TODO: Implement star functionality
-  }
 
 }
 

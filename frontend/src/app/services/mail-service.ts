@@ -8,7 +8,7 @@ export class MailService {
   private baseUrl = 'http://localhost:8080/';
   http = inject(HttpClient)
 
-  public getInbox(userId: number, page: number, size: number, searchBy: string, filterBy: string, hasAttachment: boolean, priority: string) {
+  public getInbox(userId: number, page: number, size: number, searchBy: string, filterBy: string, hasAttachment: boolean, priority: string, sortBy: string) {
     return this.http.post(`${this.baseUrl}inbox`, {
       userId,
       page,
@@ -16,10 +16,11 @@ export class MailService {
       searchBy,
       filterBy,
       hasAttachment,
-      priority
+      priority,
+      sortBy
     })
   }
-  public getSent(userId: number, page: number, size: number, searchBy: string, filterBy: string, hasAttachment: boolean, priority: string) {
+  public getSent(userId: number, page: number, size: number, searchBy: string, filterBy: string, hasAttachment: boolean, priority: string, sortBy: string) {
     return this.http.post(`${this.baseUrl}sent`, {
       userId,
       page,
@@ -27,11 +28,15 @@ export class MailService {
       searchBy,
       filterBy,
       hasAttachment,
-      priority
+      priority,
+      sortBy
     })
   }
-  public getEmail(id: number) {
-    return this.http.get(`${this.baseUrl}getEmail/${id}`);
+  public getInboxEmail(id: number) {
+    return this.http.get(`${this.baseUrl}getInoxEmail/${id}`);
+  }
+  public getSentEmail(id: number) {
+    return this.http.get(`${this.baseUrl}getSentEmail/${id}`);
   }
   public deleteMail(id: number) {
     return this.http.delete(`${this.baseUrl}deleteEmail/${id}`);

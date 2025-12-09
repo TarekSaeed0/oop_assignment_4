@@ -11,9 +11,6 @@
       <button class="btn btn-icon" (click)="onMoveToFolder()" title="Move to folder">
         <span class="icon">📁</span>
       </button>
-      <button class="btn btn-icon" (click)="onToggleStar()" title="Star">
-        <span class="icon">⭐</span>
-      </button>
     </div>
   </div>
 
@@ -38,10 +35,13 @@
       <div class="sender-email">
         &lt;{{mail()?.data?.sender?.email}}&gt;
       </div>
-      <div class="receiver-info">
-        to <span class="receiver-name">{{mail()?.data?.receiver?.name}}</span>
-        &lt;{{mail()?.data?.receiver?.email}}&gt;
-      </div>
+      @for (receiver of mail()?.data?.receivers; track $index) {
+
+        <div class="receiver-info">
+          to <span class="receiver-name">{{receiver.name}}</span>
+          &lt;{{receiver?.email}}&gt;
+        </div>
+      }
     </div>
   </div>
 

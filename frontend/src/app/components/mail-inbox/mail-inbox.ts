@@ -1,6 +1,6 @@
 import { Component, inject, input, OnInit, signal, WritableSignal } from '@angular/core';
 import { MailService } from '../../services/mail-service';
-import { Mail } from '../../types/mail';
+import { InboxMail } from '../../types/mail';
 import { CommonModule } from '@angular/common';
 import { AuthenticationService } from '../../services/authentication.service';
 
@@ -17,7 +17,7 @@ export class MailInbox implements OnInit {
     this.authService = authService;
   }
   ngOnInit(): void {
-    this.mailService.getEmail(this.currentMailId()() as number).subscribe({
+    this.mailService.getInboxEmail(this.currentMailId()() as number).subscribe({
       next: (d: any) => {
         console.log(d);
         this.mail.set(d);
@@ -26,7 +26,7 @@ export class MailInbox implements OnInit {
   }
 
   currentMailId = input.required<WritableSignal<number | null>>()
-  mail = signal<Mail | null>(null)
+  mail = signal<InboxMail | null>(null)
   handleBackToInbox = () => {
     this.currentMailId().set(null)
     this.mail.set(null);
