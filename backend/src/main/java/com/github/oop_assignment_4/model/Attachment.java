@@ -24,9 +24,15 @@ public class Attachment {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(nullable = false, unique = true)
+	private String path;
+
 	@Column(nullable = false)
 	private String name;
 
-	@Column(nullable = false, unique = true)
-	private String path;
+	@Column(nullable = false)
+	private String type;
+
+	@Column(nullable = false)
+	private Long size;
 }
