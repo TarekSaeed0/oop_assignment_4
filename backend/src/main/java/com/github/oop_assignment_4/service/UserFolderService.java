@@ -22,6 +22,28 @@ public class UserFolderService {
     @Autowired
     MailRepository mailRepository;
 
+    public Boolean isValidNameForUserFolder(String folderName, Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User Not Found"));
+
+        UserFolder userFolder = userFolderRepository
+                .findByNameAndUser(folderName, user)
+                .orElse(null);
+
+        return userFolder == null;
+    }
+
+    public List<UserFolder> getUserFolders(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User Not Found"));
+
+        List<UserFolder> theList=userFolderRepository.findByUser(user);
+              return theList;
+    }
+
+
     public UserFolder createFolder(String folderName, Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User Not Found"));
