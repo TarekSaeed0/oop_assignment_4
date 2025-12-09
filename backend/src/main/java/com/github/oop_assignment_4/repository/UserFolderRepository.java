@@ -12,4 +12,6 @@ public interface UserFolderRepository extends JpaRepository<UserFolder, Long> {
     List<UserFolder> findByName(String name);
 
     Optional<UserFolder> findByNameAndUser(String name, User user);
+     List<UserFolder> findByUser(User user);
+
 }

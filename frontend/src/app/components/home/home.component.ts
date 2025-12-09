@@ -1,17 +1,19 @@
-import { Component, HostListener, inject, signal } from '@angular/core';
+import { Component, HostListener, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../services/authentication.service';
 import { Inbox } from "../inbox/inbox";
 import { Sent } from "../sent/sent";
 import { Contact } from '../contact/contact';
+import { CreateFolderDialogComponent } from '../create-folder-dialog/create-folder-dialog';
+import { UserFolder, UserFolderService } from '../../services/UserFolderService';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, Inbox, Sent, Contact],
+  imports: [RouterLink, Inbox, Sent, Contact, CreateFolderDialogComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   folder = signal<"Inbox" | "Sent" | "Drafts" | "Trash" | number | string>("Inbox");
   changeFolder = (folderName: string) => {
     this.folder.set(folderName)
@@ -40,7 +42,45 @@ export class HomeComponent {
   ];
 
   isUserMenuOpen = false;
+  ///start userfolder service methods
+private userFolderService = inject(UserFolderService);
+  
+  // 4. State for User Folders
+  userFolders: UserFolder[] = [];
+  isCreateFolderDialogOpen = false;
 
+  ngOnInit() {
+    this.refreshUserFolders();
+  }
+
+  // 5. Helper to get current User ID (Assuming Auth Service has it)
+  // You might need to adjust this depending on how your Auth Service stores the ID
+  get currentUserId(): number {
+    return this.authenticationService.user()?.id || 0; 
+  }
+
+  // 6. Dialog Management
+  openCreateFolderDialog() {
+    this.isCreateFolderDialogOpen = true;
+  }
+
+  closeCreateFolderDialog() {
+    this.isCreateFolderDialogOpen = false;
+  }
+
+  // 7. Fetch Folders (Call this on Init and after creating a folder)
+  refreshUserFolders() {
+    if(this.currentUserId) {
+      this.userFolderService.getUserFolders(this.currentUserId).subscribe({
+        next: (folders) => {
+          this.userFolders = folders;
+        },
+        error: (err) => console.error('Failed to load folders', err)
+      });
+    }
+  }
+
+  ///done UserFolderService methods
   toggleUserMenu() {
     this.isUserMenuOpen = !this.isUserMenuOpen;
   }
