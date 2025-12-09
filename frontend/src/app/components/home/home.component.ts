@@ -11,9 +11,9 @@ import { Sent } from "../sent/sent";
   styleUrl: './home.component.css',
 })
 export class HomeComponent {
-  folder = signal<"Inbox" | "Sent" | "Drafts" | "Trash" | number | string>("Inbox");
+  selectedFolder = signal<"Inbox" | "Sent" | "Drafts" | "Trash" | number | string>("Inbox");
   changeFolder = (folderName: string) => {
-    this.folder.set(folderName)
+    this.selectedFolder.set(folderName)
   }
   folders = [
     {

@@ -90,7 +90,7 @@
             (click)="handleClickEmail(mail.id)"
           >
             <!-- Sender Avatar -->
-            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium shrink-0 mr-3">
+            <div class="w-8 h-8 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium shrink-0 mr-3">
               {{mail.data.sender?.name?.charAt(0)?.toUpperCase()}}
             </div>
 
@@ -134,8 +134,8 @@
             } -->
 
             <!-- Date -->
-            <div class="shrink-0 text-sm text-gray-500 w-24 text-right">
-              {{mail.data.sentAt }}
+            <div class="shrink-0 text-sm text-gray-500 w-fit text-right">
+              {{mail.data.sentAt | date: 'fullDate' }}
             </div>
           </div>
 

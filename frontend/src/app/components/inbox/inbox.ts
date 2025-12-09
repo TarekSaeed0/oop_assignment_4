@@ -4,11 +4,11 @@ import { MailService } from '../../services/mail-service';
 import { MailResponce } from '../../types/mail';
 import { MailInbox } from "../mail-inbox/mail-inbox";
 import { AuthenticationService } from '../../services/authentication.service';
-import { Priority } from './../../types/mail';
 import { HomeComponent } from '../home/home.component';
+import { DatePipe } from '@angular/common';
 @Component({
   selector: 'app-inbox',
-  imports: [MailInbox],
+  imports: [MailInbox, DatePipe, DatePipe],
   templateUrl: './inbox.html',
   styleUrl: './inbox.css',
 })
@@ -69,7 +69,7 @@ export class Inbox implements OnInit {
     }
   }
   isAllSelected() {
-    return this.selectedMail().length == this.inbox().length
+    return (this.selectedMail().length == this.inbox().length) && (this.inbox().length != 0)
   }
   handleRefresh = () => {
     if (this.currentMailId() == null) {

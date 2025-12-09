@@ -38,9 +38,8 @@ public class MailController {
 		return mailService.getEmail(id);
 	}
 	@DeleteMapping("deleteEmail/{id}")
-	String deleteEmail(@PathVariable Long id) {
-		System.out.println(id);
-		return mailService.DeleteById(id);
+	void deleteEmail(@PathVariable Long id) {
+		mailService.DeleteById(id);
 	}
 	@PutMapping("bulkDelete")
 	public void deleteAllById(@RequestBody List<Long> ids) {
