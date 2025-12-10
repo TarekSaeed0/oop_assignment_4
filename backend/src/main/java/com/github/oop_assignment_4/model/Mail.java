@@ -1,13 +1,9 @@
 package com.github.oop_assignment_4.model;
 
 import java.time.LocalDateTime;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,9 +30,12 @@ public class Mail {
 	@JoinColumn(name = "mail_data_id", nullable = false)
 	private MailData data;
 
+
 	@ManyToOne
 	@JoinColumn(name = "user_folder_id")
 	private UserFolder userFolder;
 
 	private LocalDateTime deletedAt;
+
+
 }

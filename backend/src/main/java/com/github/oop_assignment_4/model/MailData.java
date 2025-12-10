@@ -2,6 +2,8 @@ package com.github.oop_assignment_4.model;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,6 +39,7 @@ public class  MailData {
 	@JoinColumn(name = "sender_id", nullable = false)
 	private User sender;
 
+	@JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "mail_data_receivers",
 			joinColumns = @JoinColumn(name = "mail_data_id"),
@@ -48,7 +51,8 @@ public class  MailData {
 	private String body;
 
 	@Column(nullable = false)
-	private Priority priority;
+	@Builder.Default
+	private com.github.oop_assignment_4.model.Priority priority = Priority.NORMAL;
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "sent_mail_attachments",
@@ -59,6 +63,7 @@ public class  MailData {
 	@Column(nullable = false)
 	private LocalDateTime sentAt;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "data", cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private Set<Mail> mails;

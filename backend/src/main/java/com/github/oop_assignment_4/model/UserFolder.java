@@ -1,6 +1,9 @@
 package com.github.oop_assignment_4.model;
 
+import java.util.HashSet;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,11 +33,13 @@ public class UserFolder {
 
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
+	@JsonIgnore
 	private User user;
 
 	@Column(nullable = false)
 	private String name;
-
 	@OneToMany(mappedBy = "userFolder")
-	private Set<Mail> mails;
+	@Builder.Default
+	@JsonIgnore
+	private Set<Mail> mails = new HashSet<>();
 }

@@ -1,0 +1,54 @@
+<div class="mail-container">
+  <!-- Toolbar -->
+  <div class="mail-toolbar">
+    <button class="btn btn-icon" (click)="handleBackToSent()" title="Back to sent">
+      <span class="icon">←</span>
+    </button>
+    <div class="toolbar-actions">
+      <button class="btn btn-icon" (click)="onDelete()" title="Delete">
+        <span class="icon">🗑️</span>
+      </button>
+      <button class="btn btn-icon" (click)="onMoveToFolder()" title="Move to folder">
+        <span class="icon">📁</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mail Header -->
+  <div class="mail-header">
+    <h1 class="mail-subject">{{mail()?.data?.subject}}</h1>
+    <span class="mail-priority" [class]="'priority-' + mail()?.data?.priority?.toString()">
+      {{mail()?.data?.priority}}
+    </span>
+  </div>
+
+  <!-- Sender Info (You) -->
+  <div class="mail-meta">
+    <div class="sender-avatar">
+      {{mail()?.data?.sender?.name?.charAt(0)?.toUpperCase()}}
+    </div>
+    <div class="sender-details">
+      <div class="sender-row">
+        <span class="sender-name">{{mail()?.data?.sender?.name}} (me)</span>
+        <span class="mail-date">{{mail()?.data?.sentAt }}</span>
+      </div>
+      <div class="sender-email">
+        &lt;{{mail()?.data?.sender?.email}}&gt;
+      </div>
+      @for (receiver of mail()?.data?.receivers; track $index) {
+
+        <div class="receiver-info">
+          to <span class="receiver-name">{{receiver.name}}</span>
+          &lt;{{receiver?.email}}&gt;
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Mail Body -->
+  <div class="mail-body">
+    {{mail()?.data?.body}}
+  </div>
+
+
+</div>
