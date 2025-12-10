@@ -1,5 +1,13 @@
 @if (currentMailId() != null) {
-  <app-mail-inbox [currentMailId]="currentMailId"></app-mail-inbox>
+  @if (isCurrentMailSentByMe()) {
+    <app-mail-in-sent [currentMailId]="currentMailId"></app-mail-in-sent>
+  }
+  @else {
+     <app-mail-inbox [currentMailId]="currentMailId"></app-mail-inbox>
+  }
+  
+  
+ 
 } 
 @else {
   <div class="min-h-screen bg-gray-50">
@@ -34,10 +42,13 @@
               </button>
               <button
                 class="p-2 hover:bg-blue-50 rounded-full transition-colors group"
-                (click)="handleBulkMove()"
-                title="Move to folder"
+                (click)="handleRemoveFromFolder()"
+                title="Remove from folder"
               >
-                <span class="group-hover:scale-110 transition-transform inline-block">📁</span>
+                <span class="group-hover:scale-110 transition-transform inline-block"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+</svg>
+</span>
               </button>
             </div>
           }

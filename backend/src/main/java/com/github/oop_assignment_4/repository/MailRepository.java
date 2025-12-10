@@ -13,6 +13,7 @@ public interface MailRepository extends JpaRepository<Mail, Long> {
 	List<Mail> findByData_Sender_Id(Long dataSenderId);
 
 	List<Mail> findByUserAndData_Sender(User user, User dataSender);
-	List<Mail> findByUserAndUserFolder(User user, UserFolder folder);
-	// For Custom Folders: Active mails in a specific folder
-	}
+
+	List<Mail> findByUserAndUserFolderAndDeletedAtNull(User user, UserFolder folder);
+
+}

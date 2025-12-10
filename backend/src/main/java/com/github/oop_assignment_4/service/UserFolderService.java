@@ -98,7 +98,8 @@ public class UserFolderService {
             }
 
             mail.setUserFolder(null);
-            userFolder.getMails().remove(mail);            mailRepository.save(mail);
+            userFolder.getMails().remove(mail);
+            mailRepository.save(mail);
         }
     }
 }

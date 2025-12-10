@@ -289,7 +289,7 @@ public class MailService {
 		UserFolder folder = userFolderRepository.findByNameAndUser(folderName, user)
 				.orElseThrow(() -> new RuntimeException("Folder not found"));
 
-		List<Mail> mails = mailRepository.findByUserAndUserFolder(user, folder);
+		List<Mail> mails = mailRepository.findByUserAndUserFolderAndDeletedAtNull(user, folder);
 
 		return mails.stream()
 				.map(mail -> {
