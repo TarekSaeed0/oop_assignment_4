@@ -1,0 +1,44 @@
+.compose-window.hidden1 {
+  pointer-events: none;
+  animation: slideOut 0.3s ease-out forwards;
+}
+
+.compose-window {
+  /* Fix the window to the bottom right corner */
+  position: fixed;
+  bottom: 0;
+  right: 2rem; /* Adjusted for some margin */
+  z-index: 1000;
+
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  /* Set the initial size */
+  width: 90vw; /* Max width for mobile */
+  max-width: 700px; /* Standard desktop width */
+  height: 550px; /* Standard height */
+
+  /* Animation */
+  animation: slideIn 0.3s ease-out forwards;
+
+  /* Transition properties */
+}
+@keyframes slideIn {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes slideOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
