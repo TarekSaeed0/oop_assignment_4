@@ -6,10 +6,10 @@ import { Sent } from "../sent/sent";
 import { Contact } from '../contact/contact';
 import { CreateFolderDialogComponent } from '../create-folder-dialog/create-folder-dialog';
 import { UserFolder, UserFolderService } from '../../services/UserFolderService';
-
+import { CustomFolderComponent } from '../custom-folder/custom-folder';
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, Inbox, Sent, Contact, CreateFolderDialogComponent],
+  imports: [RouterLink, Inbox, Sent, Contact, CreateFolderDialogComponent, CustomFolderComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })

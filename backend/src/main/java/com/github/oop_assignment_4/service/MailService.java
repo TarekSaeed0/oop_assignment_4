@@ -4,16 +4,14 @@ import com.github.oop_assignment_4.dto.*;
 
 import com.github.oop_assignment_4.model.*;
 import com.github.oop_assignment_4.model.mailCriterion.*;
-import com.github.oop_assignment_4.repository.DraftRepository;
-import com.github.oop_assignment_4.repository.MailDataRepository;
-import com.github.oop_assignment_4.repository.MailRepository;
-import com.github.oop_assignment_4.repository.UserRepository;
+import com.github.oop_assignment_4.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MailService {
@@ -25,6 +23,8 @@ public class MailService {
 	private MailDataRepository mailDataRepository;
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	UserFolderRepository userFolderRepository;
 
 
 	public InboxMailDTO toInboxMailDto(Mail mail) {
@@ -280,6 +280,35 @@ public class MailService {
 			mail.setDeletedAt(LocalDateTime.now());
 		}
 		mailRepository.saveAll(toBeDeleted);
+	}
+
+	public List<MailResponse> getMailsByUserIdAndFolderName(Long userId, String folderName) {
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new RuntimeException("User not found"));
+
+		UserFolder folder = userFolderRepository.findByNameAndUser(folderName, user)
+				.orElseThrow(() -> new RuntimeException("Folder not found"));
+
+		List<Mail> mails = mailRepository.findByUserAndUserFolder(user, folder);
+
+		return mails.stream()
+				.map(mail -> {
+					MailDataResponse dataResponse = new MailDataResponse(
+							mail.getData().getSender().getName(),
+							mail.getData().getSender().getEmail(),
+							mail.getData().getSubject(),
+							mail.getData().getBody(),
+							mail.getData().getSentAt(),
+							mail.getData().getPriority()
+					);
+
+					return new MailResponse(
+							mail.getId(),
+							dataResponse,                                
+							folder.getName()
+					);
+				})
+				.collect(Collectors.toList());
 	}
 
 

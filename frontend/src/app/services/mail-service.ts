@@ -33,7 +33,7 @@ export class MailService {
     })
   }
   public getInboxEmail(id: number) {
-    return this.http.get(`${this.baseUrl}getInoxEmail/${id}`);
+    return this.http.get(`${this.baseUrl}getInboxEmail/${id}`);
   }
   public getSentEmail(id: number) {
     return this.http.get(`${this.baseUrl}getSentEmail/${id}`);
@@ -44,4 +44,13 @@ export class MailService {
   public bulkDelete(ids: number[]) {
     return this.http.put(`${this.baseUrl}bulkDelete`, ids);
   }
+
+  public getMailsByFolder(userId: number, folderName: string) {
+    return this.http.get<any[]>(`${this.baseUrl}folder/${folderName}`, {
+      params: {
+        userId: userId.toString()
+      }
+    });
+  }
+
 }

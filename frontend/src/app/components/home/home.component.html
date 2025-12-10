@@ -125,40 +125,43 @@
             </svg>
           </button>
         </div>
-<div class="space-y-1 mt-1">
-  @for (uFolder of userFolders; track uFolder.id) {
-    <button
-      type="button"
-      [title]="uFolder.name"
-      class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer text-left focus:outline-none focus:bg-gray-100"
-      [class.bg-green-100]="folder() === uFolder.name"
-      [class.text-green-700]="folder() === uFolder.name"
-      (click)="changeFolder(uFolder.name!)"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 shrink-0">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
-      </svg>
-      
-      <span class="truncate grow">{{ uFolder.name }}</span>
-    </button>
-  } 
-  @empty {
-    <div class="px-3 py-2">
-      <p class="text-xs text-gray-400 italic">No custom folders</p>
-    </div>
-  }
-</div>
+        <div class="space-y-1 mt-1">
+          @for (uFolder of userFolders; track uFolder.id) {
+            <button
+              type="button"
+              [title]="uFolder.name"
+              class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer text-left focus:outline-none focus:bg-gray-100"
+              [class.bg-green-100]="selectedFolder() === uFolder.name"
+              [class.text-green-700]="selectedFolder() === uFolder.name"
+              (click)="changeFolder(uFolder.name!)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 shrink-0">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+              </svg>
+              
+              <span class="truncate grow">{{ uFolder.name }}</span>
+            </button>
+          } 
+          @empty {
+            <div class="px-3 py-2">
+              <p class="text-xs text-gray-400 italic">No custom folders</p>
+            </div>
+          }
+        </div>
       </nav>
     </aside>
 
     <main class="bg-white grow rounded-2xl overflow-hidden shadow-lg">
       @if (selectedFolder() == "Inbox") {
-        <app-inbox  ></app-inbox>
+        <app-inbox></app-inbox>
       }
-      @if (selectedFolder() == "Sent") {
-        <app-sent ></app-sent>
+      @else if (selectedFolder() == "Sent") {
+        <app-sent></app-sent>
       }
-      </main>
+      @else {
+        <app-custom-folder [folderName]="selectedFolder().toString()"></app-custom-folder>
+      }
+    </main>
   </div>
 
   @if (isCreateFolderDialogOpen) {
