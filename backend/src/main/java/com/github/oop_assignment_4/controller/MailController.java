@@ -5,6 +5,7 @@ import com.github.oop_assignment_4.dto.InboxRequest;
 import com.github.oop_assignment_4.dto.InboxMailDTO;
 import com.github.oop_assignment_4.dto.SentMailDTO;
 import com.github.oop_assignment_4.service.MailService;
+import com.github.oop_assignment_4.service.MailServiceProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +15,11 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class MailController {
 
-	@Autowired
 	MailService mailService;
+	@Autowired
+	MailController(MailServiceProxy mailService) {
+		this.mailService = mailService;
+	}
 	@PostMapping("send")
 	public String sendEmail(@RequestBody MailSendDto mailSendDto) {
 		return mailService.sendEmail(mailSendDto);
