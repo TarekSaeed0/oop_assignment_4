@@ -115,7 +115,7 @@ public class MailService {
 	@Transactional
 	public List<SentMailDTO> getSentV2(InboxRequest inboxRequest) {
 		User sender = userRepository.findById(inboxRequest.getUserId())
-				.orElseThrow();
+				.orElseThrow(()->new RuntimeException("cant find user"));
 		List<Mail> senderCopy =mailRepository.findByUserAndData_Sender(sender, sender);
 		MailCriterion sentCriterion = new AndCriterion(new SentMailCriterion(sender), new NotDeletedCriterion()) ;
 		List<Mail> sent = sentCriterion.meetsCriterion(senderCopy);
@@ -212,6 +212,15 @@ public class MailService {
 		);
 		return toInboxDTO(paged);
 	}
+	public String isValidEmail(MailSendDto mailSendDto){
+		User test;
+		for(String to: mailSendDto.getTo()) {
+			test=(userRepository.findByEmail(to)
+					.orElseThrow(()-> new RuntimeException(to)));
+		}
+		return "done";
+	}
+
 	@Transactional
 	public String sendEmail(MailSendDto mailSendDto) {
 		User sender = userRepository.findById(mailSendDto.getUserId())
@@ -226,7 +235,7 @@ public class MailService {
 		Set<User> receivers = new HashSet<>();
 		for(String to: mailSendDto.getTo()) {
 			receivers.add(userRepository.findByEmail(to)
-					.orElseThrow(()-> new RuntimeException(to + " not found")));
+					.orElseThrow(()-> new RuntimeException(to)));
 		}
 		System.out.println("receivers = " + receivers);
 		// todo: add attachments
