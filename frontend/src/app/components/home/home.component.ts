@@ -6,10 +6,11 @@ import { Sent } from "../sent/sent";
 import { Contact } from '../contact/contact';
 import { CreateFolderDialogComponent } from '../create-folder-dialog/create-folder-dialog';
 import { UserFolder, UserFolderService } from '../../services/UserFolderService';
+import { Compose } from '../compose/compose';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, Inbox, Sent, Contact, CreateFolderDialogComponent],
+  imports: [RouterLink, Inbox, Sent, Contact, CreateFolderDialogComponent, Compose],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
@@ -44,7 +45,7 @@ export class HomeComponent {
   isUserMenuOpen = false;
   ///start userfolder service methods
 private userFolderService = inject(UserFolderService);
-  
+
   // 4. State for User Folders
   userFolders: UserFolder[] = [];
   isCreateFolderDialogOpen = false;
@@ -56,7 +57,7 @@ private userFolderService = inject(UserFolderService);
   // 5. Helper to get current User ID (Assuming Auth Service has it)
   // You might need to adjust this depending on how your Auth Service stores the ID
   get currentUserId(): number {
-    return this.authenticationService.user()?.id || 0; 
+    return this.authenticationService.user()?.id || 0;
   }
 
   // 6. Dialog Management
@@ -136,6 +137,12 @@ private userFolderService = inject(UserFolderService);
 
   toggleContactMenu() {
     this.isContactMenuOpen = !this.isContactMenuOpen;
+  }
+
+  // ! -------------------- Compose ------------------
+  isComposeOpen = false;
+  openCompose() {
+    this.isComposeOpen = true;
   }
 
 }
