@@ -1,19 +1,24 @@
 import { InboxMail } from './../../types/mail';
-import { Component, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, effect, inject, OnInit, signal,Input } from '@angular/core';
 import { MailService } from '../../services/mail-service';
 import { InboxMailResponce } from '../../types/mail';
 import { MailInbox } from "../mail-inbox/mail-inbox";
 import { AuthenticationService } from '../../services/authentication.service';
 import { HomeComponent } from '../home/home.component';
 import { DatePipe, SlicePipe } from '@angular/common';
+import { UserFolder, UserFolderService } from '../../services/UserFolderService';
+import { MoveToMenuComponent } from '../move-to-menu/move-to-menu';
+
 @Component({
   selector: 'app-inbox',
-  imports: [MailInbox, DatePipe, DatePipe, SlicePipe],
+  imports: [MailInbox, DatePipe, DatePipe, SlicePipe,MoveToMenuComponent],
   templateUrl: './inbox.html',
   styleUrl: './inbox.css',
 })
 export class Inbox implements OnInit {
-
+  @Input() userFolders: UserFolder[] = [];
+  private userFolderService = inject(UserFolderService);
+  private authServicee= inject(AuthenticationService);
   mailService = inject(MailService)
   authService: undefined | AuthenticationService = undefined;
   home: HomeComponent | undefined;
@@ -127,6 +132,25 @@ export class Inbox implements OnInit {
         return l
       }
     })
+  }
+
+  handleMoveToFolder(folderName: string) {
+    const userId = this.authServicee.user()?.id;
+    const mailIds = this.selectedMail(); // Get selected IDs from your signal/array
+
+    if (!userId || mailIds.length === 0) return;
+
+    // Call the Service
+    this.userFolderService.addToFolder(userId, folderName, mailIds).subscribe({
+      next: (response) => {
+        console.log('Moved successfully', response);
+        // Clear selection
+        this.selectedMail.set([]); 
+        // Refresh the list
+        this.handleRefresh(); 
+      },
+      error: (err) => console.error('Move failed', err)
+    });
   }
 
 }

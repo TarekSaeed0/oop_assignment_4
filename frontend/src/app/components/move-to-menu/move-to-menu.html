@@ -1,0 +1,72 @@
+<div class="relative inline-block text-left">
+
+  <button
+    type="button"
+    class="p-2 hover:bg-blue-50 rounded-full transition-colors group relative z-20"
+    [class.bg-blue-50]="isMenuOpen()"
+    (click)="toggleMenu()"
+    title="Move to folder"
+  >
+    <span class="group-hover:scale-110 transition-transform inline-block">📁</span>
+  </button>
+
+  @if (isMenuOpen()) {
+    <div class="fixed inset-0 z-10 cursor-default" (click)="closeMenu()" tabindex="-1"></div>
+  }
+
+  @if (isMenuOpen()) {
+    <div class="absolute left-0 mt-1 w-72 origin-top-left rounded-lg bg-white shadow-xl ring-1 ring-black/5 focus:outline-none z-30 flex flex-col overflow-hidden">
+      
+      <div class="px-4 pt-3 pb-2">
+        <span class="text-sm font-medium text-gray-700">Move to:</span>
+      </div>
+
+      <div class="px-2 pb-2 border-b border-gray-100">
+        <div class="relative flex items-center">
+          <input 
+            type="text" 
+            placeholder="Search..." 
+            class="w-full border-none py-1.5 pl-2 pr-8 text-sm focus:ring-0 focus:outline-none placeholder:text-gray-400"
+            [value]="searchQuery()"
+            (input)="searchQuery.set($any($event.target).value)"
+            (click)="$event.stopPropagation()" 
+            autofocus
+          >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4 text-gray-400 absolute right-2 pointer-events-none">
+            <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="overflow-y-auto max-h-60 px-1 py-1">
+        <div class="space-y-1">
+          @for (uFolder of filteredFolders(); track uFolder.id) {
+            <button
+              type="button"
+              [title]="uFolder.name"
+              class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer text-left focus:outline-none focus:bg-gray-100"
+              (click)="onSelectFolder(uFolder.name!)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 shrink-0">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+              </svg>
+              <span class="truncate grow">{{ uFolder.name }}</span>
+            </button>
+          } 
+          @empty {
+            <div class="px-3 py-3 text-center">
+              <p class="text-xs text-gray-400 italic">No matching folders</p>
+            </div>
+          }
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-100 py-1 mt-1 bg-white">
+         <button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3 transition-colors">
+            <span class="text-xl leading-none font-light text-gray-500">+</span> Create new
+         </button>
+      </div>
+
+    </div>
+  }
+</div>
