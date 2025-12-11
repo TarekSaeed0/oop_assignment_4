@@ -16,4 +16,8 @@ public interface MailRepository extends JpaRepository<Mail, Long> {
 
 	List<Mail> findByUserAndUserFolderAndDeletedAtNull(User user, UserFolder folder);
 
+
+	List<Mail> findByUserIdAndDeletedAtNotNull(Long id);
+
+	void deleteMailById(Long id);
 }
