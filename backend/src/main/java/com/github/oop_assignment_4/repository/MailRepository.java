@@ -12,4 +12,8 @@ public interface MailRepository extends JpaRepository<Mail, Long> {
 	List<Mail> findByData_Sender_Id(Long dataSenderId);
 
 	List<Mail> findByUserAndData_Sender(User user, User dataSender);
+
+	List<Mail> findByUserIdAndDeletedAtNotNull(Long id);
+
+	void deleteMailById(Long id);
 }
