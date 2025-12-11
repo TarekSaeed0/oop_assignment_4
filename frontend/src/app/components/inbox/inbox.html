@@ -25,23 +25,22 @@
           </button>
           <!-- Bulk Actions (visible when items selected) -->
           @if (selectedMail().length > 0) {
-            <div class="flex items-center gap-2 pl-2 border-l border-gray-300">
-              <button
-                class="p-2 hover:bg-red-50 rounded-full transition-colors group"
-                (click)="handleBulkDelete()"
-                title="Delete"
-              >
-                <span class="group-hover:scale-110 transition-transform inline-block">🗑️</span>
-              </button>
-              <button
-                class="p-2 hover:bg-blue-50 rounded-full transition-colors group"
-                (click)="handleBulkMove()"
-                title="Move to folder"
-              >
-                <span class="group-hover:scale-110 transition-transform inline-block">📁</span>
-              </button>
-            </div>
-          }
+  <div class="flex items-center gap-2 pl-2 border-l border-gray-300">
+    <button
+      class="p-2 hover:bg-red-50 rounded-full transition-colors group"
+      (click)="handleBulkDelete()"
+      title="Delete"
+    >
+      <span class="group-hover:scale-110 transition-transform inline-block">🗑️</span>
+    </button>
+
+    <app-move-to-menu 
+      [userFolders]="userFolders" 
+      (folderChange)="handleMoveToFolder($event)">
+    </app-move-to-menu>
+
+  </div>
+}
         </div>
         <!-- Pagination Info -->
         <div class="flex items-center gap-2 text-sm text-gray-600">

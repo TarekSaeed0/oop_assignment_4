@@ -6,9 +6,18 @@ import { inject, Injectable } from '@angular/core';
 })
 export class MailService {
   private baseUrl = 'http://localhost:8080/';
-  http = inject(HttpClient)
+  http = inject(HttpClient);
 
-  public getInbox(userId: number, page: number, size: number, searchBy: string, filterBy: string, hasAttachment: boolean, priority: string, sortBy: string) {
+  public getInbox(
+    userId: number,
+    page: number,
+    size: number,
+    searchBy: string,
+    filterBy: string,
+    hasAttachment: boolean,
+    priority: string,
+    sortBy: string
+  ) {
     return this.http.post(`${this.baseUrl}inbox`, {
       userId,
       page,
@@ -17,10 +26,19 @@ export class MailService {
       filterBy,
       hasAttachment,
       priority,
-      sortBy
-    })
+      sortBy,
+    });
   }
-  public getSent(userId: number, page: number, size: number, searchBy: string, filterBy: string, hasAttachment: boolean, priority: string, sortBy: string) {
+  public getSent(
+    userId: number,
+    page: number,
+    size: number,
+    searchBy: string,
+    filterBy: string,
+    hasAttachment: boolean,
+    priority: string,
+    sortBy: string
+  ) {
     return this.http.post(`${this.baseUrl}sent`, {
       userId,
       page,
@@ -29,11 +47,11 @@ export class MailService {
       filterBy,
       hasAttachment,
       priority,
-      sortBy
-    })
+      sortBy,
+    });
   }
   public getInboxEmail(id: number) {
-    return this.http.get(`${this.baseUrl}getInoxEmail/${id}`);
+    return this.http.get(`${this.baseUrl}getInboxEmail/${id}`);
   }
   public getSentEmail(id: number) {
     return this.http.get(`${this.baseUrl}getSentEmail/${id}`);
@@ -43,5 +61,31 @@ export class MailService {
   }
   public bulkDelete(ids: number[]) {
     return this.http.put(`${this.baseUrl}bulkDelete`, ids);
+  }
+
+  public getMailsByFolder(userId: number, folderName: string) {
+    return this.http.get<any[]>(`${this.baseUrl}folder/${folderName}`, {
+      params: {
+        userId: userId.toString()
+      }
+    });
+  }
+
+  // ! Send Email
+  // attachment handling to be added later
+  // Use clear parameter names for readability
+  public sendEmail(userId: number, to: string[], subject: string, body: string, priority: string) {
+    const payload = {
+        userId,
+        to,
+        subject,
+        body,
+        priority
+    };
+
+    // CRITICAL FIX: Add { responseType: 'text' }
+    return this.http.post(`${this.baseUrl}send`, payload, {
+        responseType: 'text' as 'json' // Angular requires this type assertion for 'text'
+    });
   }
 }

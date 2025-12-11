@@ -10,12 +10,14 @@ import { InboxMail, SentMail } from '../../types/mail';
   styleUrl: './mail-in-sent.css',
 })
 export class MailInSent {
+
   mailService = inject(MailService);
   authService: undefined | AuthenticationService;
   mail = signal<SentMail | null>(null)
   constructor(authService: AuthenticationService) {
     this.authService = authService;
   }
+  
   ngOnInit(): void {
     this.mailService.getSentEmail(this.currentMailId()() as number).subscribe({
       next: (d: any) => {

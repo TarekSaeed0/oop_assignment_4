@@ -83,7 +83,7 @@
         <button
           title="Compose a new email"
           class="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-green-500 text-white font-bold rounded-xl cursor-pointer hover:bg-green-600 transition-colors"
-          (click)="changeFolder('')"
+          (click)="openCompose()"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
             <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
@@ -131,17 +131,17 @@
       type="button"
       [title]="uFolder.name"
       class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer text-left focus:outline-none focus:bg-gray-100"
-      [class.bg-green-100]="folder() === uFolder.name"
-      [class.text-green-700]="folder() === uFolder.name"
+      [class.bg-green-100]="selectedFolder() === uFolder.name"
+      [class.text-green-700]="selectedFolder() === uFolder.name"
       (click)="changeFolder(uFolder.name!)"
     >
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 shrink-0">
         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
       </svg>
-      
+
       <span class="truncate grow">{{ uFolder.name }}</span>
     </button>
-  } 
+  }
   @empty {
     <div class="px-3 py-2">
       <p class="text-xs text-gray-400 italic">No custom folders</p>
@@ -153,12 +153,14 @@
 
     <main class="bg-white grow rounded-2xl overflow-hidden shadow-lg">
       @if (selectedFolder() == "Inbox") {
-        <app-inbox  ></app-inbox>
+    <app-inbox [userFolders]="userFolders"></app-inbox>
+  }
+      @else if (selectedFolder() == "Sent") {
+<app-sent [userFolders]="userFolders"></app-sent>      }
+      @else {
+        <app-custom-folder [folderName]="selectedFolder().toString()"></app-custom-folder>
       }
-      @if (selectedFolder() == "Sent") {
-        <app-sent ></app-sent>
-      }
-      </main>
+    </main>
   </div>
 
   @if (isCreateFolderDialogOpen) {
@@ -169,3 +171,6 @@
     ></app-create-folder-dialog>
   }
 </div>
+
+<app-compose [isComposeOpen]="isComposeOpen" (closeCompose)="isComposeOpen = false"></app-compose>
+

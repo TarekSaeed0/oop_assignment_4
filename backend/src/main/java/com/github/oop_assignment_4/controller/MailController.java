@@ -1,11 +1,10 @@
 package com.github.oop_assignment_4.controller;
 
-import com.github.oop_assignment_4.dto.MailSendDto;
-import com.github.oop_assignment_4.dto.InboxRequest;
-import com.github.oop_assignment_4.dto.InboxMailDTO;
-import com.github.oop_assignment_4.dto.SentMailDTO;
+import com.github.oop_assignment_4.dto.*;
 import com.github.oop_assignment_4.service.MailService;
+import com.github.oop_assignment_4.service.MailServiceProxy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,8 +13,11 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class MailController {
 
-	@Autowired
 	MailService mailService;
+	@Autowired
+	MailController(MailServiceProxy mailService) {
+		this.mailService = mailService;
+	}
 	@PostMapping("send")
 	public String sendEmail(@RequestBody MailSendDto mailSendDto) {
 		return mailService.sendEmail(mailSendDto);
@@ -48,5 +50,14 @@ public class MailController {
 	@PutMapping("bulkDelete")
 	public void deleteAllById(@RequestBody List<Long> ids) {
 		mailService.deleteAllById(ids);
+	}
+
+	@GetMapping("/folder/{folderName}")
+	public ResponseEntity<List<MailResponse>> getMailsByFolder(
+			@RequestParam Long userId,
+			@PathVariable String folderName
+	) {
+		List<MailResponse> mails = mailService.getMailsByUserIdAndFolderName(userId, folderName);
+		return ResponseEntity.ok(mails);
 	}
 }
