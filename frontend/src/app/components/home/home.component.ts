@@ -7,10 +7,10 @@ import { Contact } from '../contact/contact';
 import { CreateFolderDialogComponent } from '../create-folder-dialog/create-folder-dialog';
 import { UserFolder, UserFolderService } from '../../services/UserFolderService';
 import { CustomFolderComponent } from '../custom-folder/custom-folder';
-import { Compose } from "../compose/compose";
+import { Compose } from '../compose/compose';
 @Component({
-  selector: 'app-home',
   imports: [RouterLink, Inbox, Sent, Contact, CreateFolderDialogComponent, CustomFolderComponent, Compose],
+  selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
