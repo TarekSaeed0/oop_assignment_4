@@ -1,28 +1,21 @@
-import {
-  Component,
-  EventEmitter,
-  Inject,
-  Input,
-  Output,
-  computed,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, EventEmitter, Input, Output, computed, inject, signal } from '@angular/core';
 import { MailService } from '../../services/mail-service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { FormsModule } from '@angular/forms';
 import { AttachmentService } from '../../services/attachment.service';
+import { Attachment } from '../../types/mail';
+import { AttachmentComponent } from '../attachment/attachment.component';
 
 @Component({
   selector: 'app-compose',
-  imports: [FormsModule],
+  imports: [FormsModule, AttachmentComponent],
   templateUrl: './compose.html',
   styleUrl: './compose.css',
 })
 export class Compose {
   private mailService = inject(MailService);
   private authService = inject(AuthenticationService);
-  private attachmentService = Inject(AttachmentService);
+  private attachmentService = inject(AttachmentService);
 
   @Output() closeCompose = new EventEmitter<void>();
   @Input() isComposeOpen: boolean = false;
@@ -33,7 +26,10 @@ export class Compose {
   subject = signal('');
   body = signal('');
   priority = signal('NORMAL');
-  attachments = signal<File[]>([]);
+  attachments = signal<Attachment[]>([]);
+
+  isUploadingAttachments = false;
+  error = null;
 
   // ! Close the compose window
   public closeWindow(): void {
@@ -47,7 +43,14 @@ export class Compose {
     // console.log('Body:', this.body());
     // console.log('Priority:', this.priority());
     this.mailService
-      .sendEmail(this.fromUserId(), this.toEmails(), this.subject(), this.body(), this.priority())
+      .sendEmail(
+        this.fromUserId(),
+        this.toEmails(),
+        this.subject(),
+        this.body(),
+        this.priority(),
+        this.attachments(),
+      )
       .subscribe({
         // Handle the successful response (the string "sent" from the backend)
         next: (response: any) => {
@@ -93,34 +96,28 @@ export class Compose {
     this.toEmails.set(this.toEmails().filter((_, index) => index !== i));
   }
 
-  attachmentName(attachment: File) {
-    return attachment.name;
-  }
-
-  attachmentSize(attachment: File) {
-    const units = ['B', 'K', 'M', 'G', 'T'];
-
-    let size = attachment.size;
-    let unit = 0;
-
-    while (size >= 1024 && unit < units.length - 1) {
-      size = size / 1024;
-      unit++;
-    }
-
-    return `${Math.round(size)}${units[unit]}`;
-  }
-
   addAttachments(event: Event) {
     const input = event.target as HTMLInputElement;
     if (!input.files) {
       return;
     }
 
-    this.attachments.set([...this.attachments(), ...Array.from(input.files)]);
+    this.error = null;
+    this.isUploadingAttachments = true;
+
+    this.attachmentService.uploadAttachments(Array.from(input.files)).subscribe({
+      next: (attachments) => {
+        this.attachments.set([...this.attachments(), ...attachments]);
+        this.isUploadingAttachments = false;
+      },
+      error: (error) => {
+        this.error = error.error.message || 'Failed to upload attachments';
+        this.isUploadingAttachments = false;
+      },
+    });
   }
 
-  removeAttachment(index: number) {
-    this.attachments.set(this.attachments().filter((_, i) => i !== index));
+  removeAttachment(attachment: Attachment) {
+    this.attachments.set(this.attachments().filter((a) => a.id !== attachment.id));
   }
 }

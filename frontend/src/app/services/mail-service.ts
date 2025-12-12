@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { Attachment } from '../types/mail';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +17,7 @@ export class MailService {
     filterBy: string,
     hasAttachment: boolean,
     priority: string,
-    sortBy: string
+    sortBy: string,
   ) {
     return this.http.post(`${this.baseUrl}inbox`, {
       userId,
@@ -37,7 +38,7 @@ export class MailService {
     filterBy: string,
     hasAttachment: boolean,
     priority: string,
-    sortBy: string
+    sortBy: string,
   ) {
     return this.http.post(`${this.baseUrl}sent`, {
       userId,
@@ -66,26 +67,34 @@ export class MailService {
   public getMailsByFolder(userId: number, folderName: string) {
     return this.http.get<any[]>(`${this.baseUrl}folder/${folderName}`, {
       params: {
-        userId: userId.toString()
-      }
+        userId: userId.toString(),
+      },
     });
   }
 
   // ! Send Email
   // attachment handling to be added later
   // Use clear parameter names for readability
-  public sendEmail(userId: number, to: string[], subject: string, body: string, priority: string) {
+  public sendEmail(
+    userId: number,
+    to: string[],
+    subject: string,
+    body: string,
+    priority: string,
+    attachments: Attachment[],
+  ) {
     const payload = {
-        userId,
-        to,
-        subject,
-        body,
-        priority
+      userId,
+      to,
+      subject,
+      body,
+      priority,
+      attachments,
     };
 
     // CRITICAL FIX: Add { responseType: 'text' }
     return this.http.post(`${this.baseUrl}send`, payload, {
-        responseType: 'text' as 'json' // Angular requires this type assertion for 'text'
+      responseType: 'text' as 'json', // Angular requires this type assertion for 'text'
     });
   }
 }

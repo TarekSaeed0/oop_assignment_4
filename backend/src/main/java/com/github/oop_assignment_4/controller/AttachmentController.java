@@ -31,12 +31,23 @@ public class AttachmentController {
 				.map(file -> attachmentService.uploadAttachment(file)).toList());
 	}
 
-	@GetMapping("/download/{id}")
+	@GetMapping("/{id}/download")
 	public ResponseEntity<Resource> downloadAttachment(@PathVariable Long id) {
-		Resource resource = attachmentService.downloadAttachment(id);
+		AttachmentDTO attachmentDTO = attachmentService.getAttachment(id);
+		Resource resource = attachmentService.getAttachmentResource(id);
 		return ResponseEntity.ok()
 				.header(HttpHeaders.CONTENT_DISPOSITION,
-						"inline; filename=\"" + resource.getFilename() + "\"")
+						"attachment; filename=\"" + attachmentDTO.getName() + "\"")
+				.body(resource);
+	}
+
+	@GetMapping("/{id}/view")
+	public ResponseEntity<Resource> viewAttachment(@PathVariable Long id) {
+		AttachmentDTO attachmentDTO = attachmentService.getAttachment(id);
+		Resource resource = attachmentService.getAttachmentResource(id);
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION,
+						"inline; filename=\"" + attachmentDTO.getName() + "\"")
 				.body(resource);
 	}
 
@@ -48,11 +59,5 @@ public class AttachmentController {
 	@GetMapping("/{id}")
 	public ResponseEntity<AttachmentDTO> getAttachment(@PathVariable Long id) {
 		return ResponseEntity.ok(attachmentService.getAttachment(id));
-	}
-
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteAttachment(@PathVariable Long id) {
-		attachmentService.deleteAttachment(id);
-		return ResponseEntity.noContent().build();
 	}
 }

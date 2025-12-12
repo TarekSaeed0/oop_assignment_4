@@ -1,7 +1,6 @@
 package com.github.oop_assignment_4.dto;
 
-
-import com.github.oop_assignment_4.model.Priority;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,5 +14,5 @@ public class MailSendDto {
 	private String subject;
 	private String[] to;
 	private String priority;
-
+	private List<AttachmentDTO> attachments;
 }

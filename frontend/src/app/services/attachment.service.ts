@@ -20,13 +20,13 @@ export class AttachmentService {
     for (let file of files) {
       formData.append('files', file);
     }
-    return this.http.post<Attachment>(`${this.baseUrl}/upload`, formData, {
+    return this.http.post<Attachment[]>(`${this.baseUrl}/upload`, formData, {
       withCredentials: true,
     });
   }
 
   downloadAttachment(id: number) {
-    return this.http.get(`${this.baseUrl}/download/${id}`, {
+    return this.http.get(`${this.baseUrl}/${id}/download`, {
       withCredentials: true,
       responseType: 'blob',
     });
@@ -42,9 +42,5 @@ export class AttachmentService {
 
   getAttachment(id: number) {
     return this.http.get<Attachment>(`${this.baseUrl}/${id}`, { withCredentials: true });
-  }
-
-  deleteAttachment(id: number) {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
 }

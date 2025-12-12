@@ -55,8 +55,8 @@ public class  MailData {
 	private Priority priority = Priority.NORMAL;
 
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "sent_mail_attachments",
-			joinColumns = @JoinColumn(name = "sent_mail_id"),
+	@JoinTable(name = "mail_data_attachments",
+			joinColumns = @JoinColumn(name = "mail_data_id"),
 			inverseJoinColumns = @JoinColumn(name = "attachment_id"))
 	private Set<Attachment> attachments;
 
