@@ -1,7 +1,17 @@
-import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Inject,
+  Input,
+  Output,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { MailService } from '../../services/mail-service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { FormsModule } from '@angular/forms';
+import { AttachmentService } from '../../services/attachment.service';
 
 @Component({
   selector: 'app-compose',
@@ -12,24 +22,18 @@ import { FormsModule } from '@angular/forms';
 export class Compose {
   private mailService = inject(MailService);
   private authService = inject(AuthenticationService);
-
-  ngOnInit(): void {
-    this.authService.loadUser().subscribe((user) => {
-      if (user) this.fromUserId.set(user.id);
-      console.log('From User ID in Compose:', this.fromUserId());
-      console.log('User in Compose:', user);
-    });
-  }
+  private attachmentService = Inject(AttachmentService);
 
   @Output() closeCompose = new EventEmitter<void>();
   @Input() isComposeOpen: boolean = false;
 
-  fromUserId = signal(0);
+  fromUserId = computed(() => this.authService.user()?.id || 0);
   toEmails = signal<string[]>([]);
   toEmailInput = signal('');
   subject = signal('');
   body = signal('');
   priority = signal('NORMAL');
+  attachments = signal<File[]>([]);
 
   // ! Close the compose window
   public closeWindow(): void {
@@ -75,6 +79,7 @@ export class Compose {
     this.subject.set('');
     this.body.set('');
     this.priority.set('NORMAL');
+    this.attachments.set([]);
   }
 
   addEmail() {
@@ -86,5 +91,36 @@ export class Compose {
 
   removeEmail(i: number) {
     this.toEmails.set(this.toEmails().filter((_, index) => index !== i));
+  }
+
+  attachmentName(attachment: File) {
+    return attachment.name;
+  }
+
+  attachmentSize(attachment: File) {
+    const units = ['B', 'K', 'M', 'G', 'T'];
+
+    let size = attachment.size;
+    let unit = 0;
+
+    while (size >= 1024 && unit < units.length - 1) {
+      size = size / 1024;
+      unit++;
+    }
+
+    return `${Math.round(size)}${units[unit]}`;
+  }
+
+  addAttachments(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files) {
+      return;
+    }
+
+    this.attachments.set([...this.attachments(), ...Array.from(input.files)]);
+  }
+
+  removeAttachment(index: number) {
+    this.attachments.set(this.attachments().filter((_, i) => i !== index));
   }
 }

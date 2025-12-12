@@ -25,9 +25,10 @@ public class AttachmentController {
 	}
 
 	@PostMapping("/upload")
-	public ResponseEntity<AttachmentDTO> uploadAttachment(
-			@RequestParam("file") MultipartFile file) {
-		return ResponseEntity.ok(attachmentService.uploadAttachment(file));
+	public ResponseEntity<List<AttachmentDTO>> uploadAttachments(
+			@RequestParam("files") List<MultipartFile> files) {
+		return ResponseEntity.ok(files.stream()
+				.map(file -> attachmentService.uploadAttachment(file)).toList());
 	}
 
 	@GetMapping("/download/{id}")

@@ -52,7 +52,7 @@ public class  MailData {
 
 	@Column(nullable = false)
 	@Builder.Default
-	private com.github.oop_assignment_4.model.Priority priority = Priority.NORMAL;
+	private Priority priority = Priority.NORMAL;
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "sent_mail_attachments",

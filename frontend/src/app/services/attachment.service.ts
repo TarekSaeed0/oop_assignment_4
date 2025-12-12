@@ -15,9 +15,11 @@ export class AttachmentService {
   private http = inject(HttpClient);
   private baseUrl = 'http://localhost:8080/api/attachments';
 
-  uploadAttachment(file: File) {
+  uploadAttachments(files: File[]) {
     const formData = new FormData();
-    formData.append('file', file);
+    for (let file of files) {
+      formData.append('files', file);
+    }
     return this.http.post<Attachment>(`${this.baseUrl}/upload`, formData, {
       withCredentials: true,
     });
