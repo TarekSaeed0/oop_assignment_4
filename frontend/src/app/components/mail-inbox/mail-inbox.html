@@ -1,0 +1,58 @@
+<div class="mail-container">
+  <!-- Toolbar -->
+  <div class="mail-toolbar">
+    <button class="btn btn-icon" (click)="handleBackToInbox()" title="Back to inbox">
+      <span class="icon">←</span>
+    </button>
+    <div class="toolbar-actions">
+      <button class="btn btn-icon" (click)="onDelete()" title="Delete">
+        <span class="icon">🗑️</span>
+      </button>
+      <button class="btn btn-icon" (click)="onMoveToFolder()" title="Move to folder">
+        <span class="icon">📁</span>
+      </button>
+      <button class="btn btn-icon" (click)="onMarkAsSpam()" title="Mark as spam">
+        <span class="icon">⚠️</span>
+      </button>
+      <button class="btn btn-icon" (click)="onToggleStar()" title="Star">
+        <span class="icon">⭐</span>
+      </button>
+      <button class="btn btn-icon" (click)="onMarkUnread()" title="Mark as unread">
+        <span class="icon">✉️</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mail Header -->
+  <div class="mail-header">
+    <h1 class="mail-subject">{{mail()?.data?.subject}}</h1>
+    <span class="mail-priority" [class]="'priority-' + mail()?.data?.priority?.toString()">
+      {{mail()?.data?.priority}}
+    </span>
+  </div>
+
+  <!-- Sender Info -->
+  <div class="mail-meta">
+    <div class="sender-avatar">
+      {{mail()?.data?.sender?.name?.charAt(0)?.toUpperCase()}}
+    </div>
+    <div class="sender-details">
+      <div class="sender-row">
+        <span class="sender-name">{{mail()?.data?.sender?.name}}</span>
+        <span class="mail-date">{{mail()?.data?.sentAt?.getUTCDate}}</span>
+      </div>
+      <div class="sender-email">
+        &lt;{{mail()?.data?.sender?.email}}&gt;
+      </div>
+      <div class="receiver-info">
+        to <span class="receiver-name">{{authService?.user()?.email}} (me)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mail Body -->
+  <div class="mail-body">
+    {{mail()?.data?.body}}
+  </div>
+
+</div>

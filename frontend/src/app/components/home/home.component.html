@@ -1,0 +1,176 @@
+<div class="flex flex-col h-screen bg-gray-100 text-gray-800">
+  <header class="h-16 bg-white flex items-center justify-between shadow-lg pl-6 pr-4 relative z-20">
+    <a routerLink="/" class="text-2xl font-bold text-gray-800 cursor-pointer">
+      CSED<span class="text-green-500">Mail</span>
+    </a>
+
+    <div class="relative grow max-w-xl mx-8">
+      <button
+        title="Search mail"
+        class="absolute left-1.75 top-1/2 transform -translate-y-1/2 p-1.25 rounded-full text-gray-700 hover:bg-gray-100 active:bg-gray-200 focus:outline-none transition-colors duration-400 cursor-pointer"
+        aria-label="Search"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+        </svg>
+      </button>
+      <input
+        type="search"
+        placeholder="Search mail"
+        class="w-full pr-4 pl-10 py-2 border border-gray-300 rounded-full outline-none focus:border-green-500 placeholder-gray-500 text-gray-800 transition-colors"
+        (keydown)="handleSearchTyping($event)"
+        (change)="handleSearchChange($event)"
+      />
+    </div>
+
+    <div class="flex items-center gap-2">
+      <div
+        title="contacts"
+        class="p-1 rounded-full hover:bg-gray-100 active:bg-gray-200 focus:outline-none transition-colors duration-400"
+        [class.!bg-gray-200]="isContactMenuOpen"
+      >
+        <button
+          id="contact-menu-button"
+          (click)="toggleContactMenu()"
+          class="size-10 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold cursor-pointer"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
+          </svg>
+        </button>
+      </div>
+
+      @if (isContactMenuOpen) {
+        <app-contact></app-contact>
+      }
+
+      <div
+        id="user-menu"
+        class="absolute right-4 top-14 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+      >
+        <button
+          id="user-menu-button"
+          (click)="toggleUserMenu()"
+          [title]="userMenuButtonTitle()"
+          class="size-10 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold cursor-pointer"
+        >
+          {{ userInitials() }}
+        </button>
+      </div>
+
+      @if (isUserMenuOpen) {
+        <div id="user-menu" class="absolute right-4 top-14 bg-white border border-gray-200 rounded-lg shadow-lg z-30">
+          <div class="flex flex-col gap-2 items-center justify-center p-8 pb-3 text-sm text-gray-700 border-b border-gray-100">
+            <span class="size-20 rounded-full bg-green-500 text-white flex items-center justify-center text-4xl font-semibold">
+              {{ userInitials() }}
+            </span>
+            <div class="flex flex-col items-center">
+              <span class="text-xl font-medium">{{ userName() }}</span>
+              <span class="text-sm text-gray-700">{{ userEmail() }}</span>
+            </div>
+          </div>
+          <a (click)="signOut()" class="block px-4 pt-2 pb-3 text-sm text-gray-700 hover:bg-gray-100 border-t border-gray-100 cursor-pointer">
+            Sign out
+          </a>
+        </div>
+      }
+    </div>
+  </header>
+
+  <div class="flex grow gap-4 m-4 relative z-10">
+    <aside class="w-64 bg-white rounded-2xl flex flex-col shadow-lg pt-6 pb-4 px-4">
+      <div class="px-2 mb-4">
+        <button
+          title="Compose a new email"
+          class="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-green-500 text-white font-bold rounded-xl cursor-pointer hover:bg-green-600 transition-colors"
+          (click)="openCompose()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
+            <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
+          </svg>
+          <span>Compose</span>
+        </button>
+      </div>
+
+      <nav class="grow space-y-1 overflow-y-auto">
+        <div class="space-y-1">
+          @for (folder of folders; track folder.name) {
+            <a
+              [title]="folder.name"
+              (click)="changeFolder(folder.name)"
+              [class]="`flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700
+              hover:bg-gray-100 transition-colors cursor-pointer
+              ${selectedFolder() == folder.name? 'bg-gray-300': ''}`"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="folder.icon" />
+              </svg>
+              <span>{{ folder.name }}</span>
+              @if (folder.count > 0) {
+                <span class="ml-auto text-xs font-bold bg-green-500 text-white px-2 py-0.5 rounded-full">{{ folder.count }}</span>
+              }
+            </a>
+          }
+        </div>
+
+        <div class="flex items-center justify-between pl-3 text-gray-700 mt-4">
+          <span class="font-medium select-none">User Folders</span>
+          <button
+            title="Create a new user folder"
+            (click)="openCreateFolderDialog()"
+            class="p-1.25 rounded-full hover:bg-gray-100 active:bg-gray-200 focus:outline-none transition-colors duration-400 cursor-pointer"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+          </button>
+        </div>
+<div class="space-y-1 mt-1">
+  @for (uFolder of userFolders; track uFolder.id) {
+    <button
+      type="button"
+      [title]="uFolder.name"
+      class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer text-left focus:outline-none focus:bg-gray-100"
+      [class.bg-green-100]="selectedFolder() === uFolder.name"
+      [class.text-green-700]="selectedFolder() === uFolder.name"
+      (click)="changeFolder(uFolder.name!)"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 shrink-0">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+      </svg>
+
+      <span class="truncate grow">{{ uFolder.name }}</span>
+    </button>
+  }
+  @empty {
+    <div class="px-3 py-2">
+      <p class="text-xs text-gray-400 italic">No custom folders</p>
+    </div>
+  }
+</div>
+      </nav>
+    </aside>
+
+    <main class="bg-white grow rounded-2xl overflow-hidden shadow-lg">
+      @if (selectedFolder() == "Inbox") {
+    <app-inbox [userFolders]="userFolders"></app-inbox>
+  }
+      @else if (selectedFolder() == "Sent") {
+<app-sent [userFolders]="userFolders"></app-sent>      }
+      @else {
+        <app-custom-folder [folderName]="selectedFolder().toString()"></app-custom-folder>
+      }
+    </main>
+  </div>
+
+  @if (isCreateFolderDialogOpen) {
+    <app-create-folder-dialog
+      [userId]="currentUserId"
+      (close)="closeCreateFolderDialog()"
+      (folderCreated)="refreshUserFolders()"
+    ></app-create-folder-dialog>
+  }
+</div>
+
+<app-compose [isComposeOpen]="isComposeOpen" (closeCompose)="isComposeOpen = false"></app-compose>
+
