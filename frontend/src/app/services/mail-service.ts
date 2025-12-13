@@ -71,6 +71,7 @@ export class MailService {
       },
     });
   }
+  
 
   // ! Send Email
   // attachment handling to be added later
@@ -95,6 +96,21 @@ export class MailService {
     // CRITICAL FIX: Add { responseType: 'text' }
     return this.http.post(`${this.baseUrl}send`, payload, {
       responseType: 'text' as 'json', // Angular requires this type assertion for 'text'
+    });
+  }
+
+  public isValidEmail(userId: number, to: string[], subject: string, body: string, priority: string) {
+    const payload = {
+        userId,
+        to,
+        subject,
+        body,
+        priority
+    };
+
+    // CRITICAL FIX: Add { responseType: 'text' }
+    return this.http.post(`${this.baseUrl}check`, payload, {
+        responseType: 'text' as 'json' // Angular requires this type assertion for 'text'
     });
   }
 }

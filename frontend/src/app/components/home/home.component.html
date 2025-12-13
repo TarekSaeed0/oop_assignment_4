@@ -36,11 +36,11 @@
       />
     </div>
 
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-1">
       <div
         title="contacts"
         class="p-1 rounded-full hover:bg-gray-100 active:bg-gray-200 focus:outline-none transition-colors duration-400"
-        [class.!bg-gray-200]="isContactMenuOpen"
+        
       >
         <button
           id="contact-menu-button"
@@ -69,7 +69,8 @@
       }
 
       <div
-        class="p-1 rounded-full hover:bg-gray-100 active:bg-gray-200 focus:outline-none transition-colors duration-400"
+        id="user-menu"
+        class="right-4 top-14 z-50 rounded-full hover:bg-gray-100 active:bg-gray-200 focus:outline-none transition-colors duration-400"
         [class.!bg-gray-200]="isUserMenuOpen"
       >
         <button
@@ -77,7 +78,7 @@
           (click)="toggleUserMenu()"
           [title]="userMenuButtonTitle()"
           class="size-10 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold cursor-pointer"
-        >
+          >
           {{ userInitials() }}
         </button>
       </div>

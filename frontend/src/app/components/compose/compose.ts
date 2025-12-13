@@ -30,18 +30,39 @@ export class Compose {
 
   isUploadingAttachments = false;
   error = null;
+  
+  // Holds the error message if a user is not found
+  userNotFound = signal(null as string | null);
+  
+  // Loading state to prevent double clicks
+  isSending = signal(false);
 
-  // ! Close the compose window
+  ngOnInit(): void {
+    this.authService.loadUser().subscribe((user) => {
+      if (user) this.fromUserId.set(user.id);
+    });
+  }
+
   public closeWindow(): void {
     this.closeCompose.emit();
   }
 
+  isitme() {
+    return this.toEmails().includes(this.authService.user()?.email || '');
+  }
+
+  // ! REFACTORED SEND LOGIC
   sendEmail() {
-    // console.log('Sending email from user ID:', this.fromUserId());
-    // console.log('To Emails:', this.toEmails());
-    // console.log('Subject:', this.subject());
-    // console.log('Body:', this.body());
-    // console.log('Priority:', this.priority());
+    const recipients = this.toEmails().filter((l) => this.authService.user()?.email != l);
+
+    if (recipients.length === 0) {
+      console.error('❌ No valid recipient email addresses provided.');
+      return;
+    }
+
+    this.userNotFound.set(null);
+    this.isSending.set(true);
+
     this.mailService
       .sendEmail(
         this.fromUserId(),
@@ -51,30 +72,50 @@ export class Compose {
         this.priority(),
         this.attachments(),
       )
+      .isValidEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority())
       .subscribe({
-        // Handle the successful response (the string "sent" from the backend)
-        next: (response: any) => {
-          // Print the returned string to the console
-          console.log('✅ API Response (Email Sent):', response);
+        next: (checkResponse) => {
+          console.log('✅ Validation Passed:', checkResponse);
 
-          // Perform success actions ONLY after successful send
-          this.clearForm();
-          // this.closeWindow();
+          this.performSend(recipients);
         },
-
-        // Handle any errors during the API call (e.g., recipient not found, 4xx/5xx errors)
-        error: (error) => {
-          console.error('❌ Email Sending Failed:', error);
-          // Optional: Display an error message to the user
-        },
-
-        // Optional: Runs when the observable completes (after next/error)
-        complete: () => {
-          console.log('📧 Send email Observable complete.');
+        error: (error: HttpErrorResponse) => {
+          this.handleError(error);
+          this.isSending.set(false);
         },
       });
-    this.clearForm();
-    this.closeWindow();
+  }
+
+  private performSend(recipients: string[]) {
+    this.mailService
+      .sendEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority())
+      .subscribe({
+        next: (response) => {
+         this.clearForm();
+          this.isSending.set(false);
+          this.closeWindow();
+        },
+        error: (error) => {
+          console.error('❌ Send Failed:', error);
+          this.isSending.set(false);
+        },
+      });
+  }
+
+  // Helper to handle the backend error
+  private handleError(error: HttpErrorResponse) {
+    console.error('❌ Validation Failed:', error);
+    
+    try {
+      const errorBody = typeof error.error === 'string' ? JSON.parse(error.error) : error.error;
+      
+      // Extract the message (which contains the email)
+      const invalidEmail = errorBody.message; 
+      
+      this.userNotFound.set(invalidEmail);
+    } catch (e) {
+      this.userNotFound.set('Unknown error occurred');
+    }
   }
 
   clearForm() {
@@ -83,17 +124,20 @@ export class Compose {
     this.body.set('');
     this.priority.set('NORMAL');
     this.attachments.set([]);
+    this.userNotFound.set(null);
   }
 
   addEmail() {
     if (this.toEmailInput().trim()) {
       this.toEmails.set([...this.toEmails(), this.toEmailInput().trim()]);
       this.toEmailInput.set('');
+      this.userNotFound.set(null);
     }
   }
 
   removeEmail(i: number) {
     this.toEmails.set(this.toEmails().filter((_, index) => index !== i));
+    this.userNotFound.set(null);
   }
 
   addAttachments(event: Event) {

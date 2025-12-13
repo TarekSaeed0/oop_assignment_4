@@ -117,12 +117,10 @@ public class MailService {
 
 	@Transactional
 	public List<SentMailDTO> getSentV2(InboxRequest inboxRequest) {
-		User sender =
-				userRepository.findById(inboxRequest.getUserId()).orElseThrow();
-		List<Mail> senderCopy =
-				mailRepository.findByUserAndData_Sender(sender, sender);
-		MailCriterion sentCriterion = new AndCriterion(
-				new SentMailCriterion(sender), new NotDeletedCriterion());
+		User sender = userRepository.findById(inboxRequest.getUserId())
+				.orElseThrow(()->new RuntimeException("cant find user"));
+		List<Mail> senderCopy =mailRepository.findByUserAndData_Sender(sender, sender);
+		MailCriterion sentCriterion = new AndCriterion(new SentMailCriterion(sender), new NotDeletedCriterion()) ;
 		List<Mail> sent = sentCriterion.meetsCriterion(senderCopy);
 
 		List<Mail> filtered = filter(false, sent, inboxRequest.getFilterBy(),
@@ -211,6 +209,14 @@ public class MailService {
 								(inboxRequest.getPage() - 1) * inboxRequest.getSize()
 										+ inboxRequest.getSize()));
 		return toInboxDTO(paged);
+	}
+	public String isValidEmail(MailSendDto mailSendDto){
+		User test;
+		for(String to: mailSendDto.getTo()) {
+			test=(userRepository.findByEmail(to)
+					.orElseThrow(()-> new RuntimeException(to)));
+		}
+		return "done";
 	}
 
 	@Transactional

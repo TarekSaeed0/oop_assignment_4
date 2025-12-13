@@ -45,7 +45,6 @@
       </div>
     </div>
 
-    <!-- ! form -->
     <div class="flex flex-col grow p-0">
       <div class="border-b border-gray-200 flex items-start p-2">
         <div class="flex flex-wrap items-center grow space-x-2">
@@ -98,6 +97,19 @@
         />
       </div>
 
+      <div class="border-b border-gray-200 flex items-center px-4 py-2 text-sm text-gray-600">
+        <label for="priority-select" class="font-medium mr-2">Priority:</label>
+        <select
+          id="priority-select"
+          [(ngModel)]="priority"
+          class="border border-gray-300 rounded-md py-1 px-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+        >
+          <option value="NORMAL">NORMAL</option>
+          <option value="LOW">LOW</option>
+          <option value="HIGH">HIGH</option>
+          <option value="URGENT">URGENT</option>
+        </select>
+      </div>
       <textarea
         placeholder="Message Body"
         [(ngModel)]="body"
@@ -158,6 +170,32 @@
           (change)="addAttachments($event)"
           class="hidden"
         />
+      <div class="p-2 border-t border-gray-200 flex flex-col justify-start items-start">
+
+        @if (isitme()) {
+          <span class="text-red-600 text-sm font-medium py-2 rounded">
+            ❌ You cannot send an email to yourself.
+          </span>
+        }
+
+        @else {
+          <div class="flex items-center gap-4">
+            <button
+              (click)="sendEmail()"
+              [disabled]="isSending()"
+              type="button"
+              class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium py-2 px-4 rounded transition duration-150 ease-in-out"
+            >
+              @if(isSending()) { Sending... } @else { Send }
+            </button>
+
+            @if (userNotFound()) {
+              <span class="text-red-600 text-sm font-medium">
+                ❌ {{ userNotFound() }} email doesn't exist
+              </span>
+            }
+          </div>
+        }
       </div>
     </div>
   </div>

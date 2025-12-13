@@ -23,6 +23,12 @@ public class MailController {
 		return mailService.sendEmail(mailSendDto);
 	}
 
+	@PostMapping("check")
+	public String isValidEmail(@RequestBody MailSendDto mailSendDto) {
+		return mailService.isValidEmail(mailSendDto);
+	}
+
+
 	@PostMapping("inbox")
 	List<InboxMailDTO> getInbox(@RequestBody InboxRequest inboxRequest) {
 		return mailService.getInbox(inboxRequest);
