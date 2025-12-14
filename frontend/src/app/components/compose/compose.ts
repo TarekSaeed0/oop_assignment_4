@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Input, Output, computed, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, WritableSignal, computed, inject, signal } from '@angular/core';
 import { MailService } from '../../services/mail-service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { FormsModule } from '@angular/forms';
 import { AttachmentService } from '../../services/attachment.service';
 import { Attachment } from '../../types/mail';
 import { AttachmentComponent } from '../attachment/attachment.component';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-compose',
@@ -20,8 +21,7 @@ export class Compose {
   @Output() closeCompose = new EventEmitter<void>();
   @Input() isComposeOpen: boolean = false;
 
-  fromUserId = computed(() => this.authService.user()?.id || 0);
-  toEmails = signal<string[]>([]);
+fromUserId: WritableSignal<number> = signal(0);  toEmails = signal<string[]>([]);
   toEmailInput = signal('');
   subject = signal('');
   body = signal('');
@@ -72,7 +72,7 @@ export class Compose {
         this.priority(),
         this.attachments(),
       )
-      .isValidEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority())
+      this.mailService.isValidEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority())
       .subscribe({
         next: (checkResponse) => {
           console.log('✅ Validation Passed:', checkResponse);
@@ -86,16 +86,25 @@ export class Compose {
       });
   }
 
+ // src/app/components/compose/compose.ts
+
   private performSend(recipients: string[]) {
     this.mailService
-      .sendEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority())
+      .sendEmail(
+        this.fromUserId(),
+        recipients,
+        this.subject(),
+        this.body(),
+        this.priority(),
+        this.attachments() // <--- ADD THIS (The 6th argument)
+      )
       .subscribe({
         next: (response) => {
-         this.clearForm();
+          this.clearForm();
           this.isSending.set(false);
           this.closeWindow();
         },
-        error: (error) => {
+        error: (error: HttpErrorResponse) => {
           console.error('❌ Send Failed:', error);
           this.isSending.set(false);
         },
