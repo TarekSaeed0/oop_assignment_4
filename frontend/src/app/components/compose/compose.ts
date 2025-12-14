@@ -30,17 +30,17 @@ export class Compose {
 
   isUploadingAttachments = false;
   error = null;
-  
+
   // Holds the error message if a user is not found
   userNotFound = signal(null as string | null);
-  
+
   // Loading state to prevent double clicks
   isSending = signal(false);
 
   ngOnInit(): void {
-    this.authService.loadUser().subscribe((user) => {
-      if (user) this.fromUserId.set(user.id);
-    });
+    // this.authService.loadUser().subscribe((user) => {
+    //   if (user) this.fromUserId.set(user.id);
+    // });
   }
 
   public closeWindow(): void {
@@ -72,14 +72,14 @@ export class Compose {
         this.priority(),
         this.attachments(),
       )
-      .isValidEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority())
+      // .isValidEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority())
       .subscribe({
-        next: (checkResponse) => {
+        next: (checkResponse: any) => {
           console.log('✅ Validation Passed:', checkResponse);
 
           this.performSend(recipients);
         },
-        error: (error: HttpErrorResponse) => {
+        error: (error: any) => {
           this.handleError(error);
           this.isSending.set(false);
         },
@@ -88,10 +88,10 @@ export class Compose {
 
   private performSend(recipients: string[]) {
     this.mailService
-      .sendEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority())
+      .sendEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority(), this.attachments())
       .subscribe({
         next: (response) => {
-         this.clearForm();
+          this.clearForm();
           this.isSending.set(false);
           this.closeWindow();
         },
@@ -103,15 +103,15 @@ export class Compose {
   }
 
   // Helper to handle the backend error
-  private handleError(error: HttpErrorResponse) {
+  private handleError(error: any) {
     console.error('❌ Validation Failed:', error);
-    
+
     try {
       const errorBody = typeof error.error === 'string' ? JSON.parse(error.error) : error.error;
-      
+
       // Extract the message (which contains the email)
-      const invalidEmail = errorBody.message; 
-      
+      const invalidEmail = errorBody.message;
+
       this.userNotFound.set(invalidEmail);
     } catch (e) {
       this.userNotFound.set('Unknown error occurred');
