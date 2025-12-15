@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { AttachmentService } from '../../services/attachment.service';
 import { Attachment } from '../../types/mail';
 import { AttachmentComponent } from '../attachment/attachment.component';
+import { HttpErrorResponse } from '@angular/common/http';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-compose',
@@ -20,7 +22,7 @@ export class Compose {
   @Output() closeCompose = new EventEmitter<void>();
   @Input() isComposeOpen: boolean = false;
 
-  fromUserId = computed(() => this.authService.user()?.id || 0);
+  fromUserId = signal(0);
   toEmails = signal<string[]>([]);
   toEmailInput = signal('');
   subject = signal('');
@@ -50,7 +52,6 @@ export class Compose {
   isitme() {
     return this.toEmails().includes(this.authService.user()?.email || '');
   }
-
   // ! REFACTORED SEND LOGIC
   sendEmail() {
     const recipients = this.toEmails().filter((l) => this.authService.user()?.email != l);
@@ -91,6 +92,23 @@ export class Compose {
       .sendEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority(), this.attachments())
       .subscribe({
         next: (response) => {
+      //.isValidEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority())
+      //.pipe(
+        //switchMap(() => 
+          //this.mailService.sendEmail(
+            //this.fromUserId(),
+            //this.toEmails(),
+            //this.subject(),
+            //this.body(),
+            //this.priority(),
+            //this.attachments(),
+          //)
+        //)
+      //)
+      //.subscribe({
+        //next: (response:any) => {
+          //console.log('✅ Email Sent:', response);
+
           this.clearForm();
           this.isSending.set(false);
           this.closeWindow();

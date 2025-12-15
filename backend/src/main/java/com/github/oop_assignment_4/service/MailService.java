@@ -118,9 +118,11 @@ public class MailService {
 	@Transactional
 	public List<SentMailDTO> getSentV2(InboxRequest inboxRequest) {
 		User sender = userRepository.findById(inboxRequest.getUserId())
-				.orElseThrow(()->new RuntimeException("cant find user"));
-		List<Mail> senderCopy =mailRepository.findByUserAndData_Sender(sender, sender);
-		MailCriterion sentCriterion = new AndCriterion(new SentMailCriterion(sender), new NotDeletedCriterion()) ;
+				.orElseThrow(() -> new RuntimeException("cant find user"));
+		List<Mail> senderCopy =
+				mailRepository.findByUserAndData_Sender(sender, sender);
+		MailCriterion sentCriterion = new AndCriterion(
+				new SentMailCriterion(sender), new NotDeletedCriterion());
 		List<Mail> sent = sentCriterion.meetsCriterion(senderCopy);
 
 		List<Mail> filtered = filter(false, sent, inboxRequest.getFilterBy(),
@@ -189,14 +191,15 @@ public class MailService {
 
 	@Transactional
 	public List<InboxMailDTO> getTrash(InboxRequest inboxRequest) {
-		User receiver =
-				userRepository.findById(inboxRequest.getUserId()).orElseThrow();
 		List<Mail> allMail = mailRepository.findByUserId(inboxRequest.getUserId());
 
-		MailCriterion receivedMailCriterion = new AndCriterion(
-				new DeletedCriterion(), new ReceivedMailCriterion(receiver));
+		MailCriterion receivedMailCriterion = new DeletedCriterion();
+
+		System.out.println(allMail);
 
 		List<Mail> received = receivedMailCriterion.meetsCriterion(allMail);
+
+		System.out.println(received);
 
 		List<Mail> filtered = filter(true, received, inboxRequest.getFilterBy(),
 				inboxRequest.getSearchBy(), inboxRequest.getPriority(),
@@ -210,11 +213,12 @@ public class MailService {
 										+ inboxRequest.getSize()));
 		return toInboxDTO(paged);
 	}
-	public String isValidEmail(MailSendDto mailSendDto){
+
+	public String isValidEmail(MailSendDto mailSendDto) {
 		User test;
-		for(String to: mailSendDto.getTo()) {
-			test=(userRepository.findByEmail(to)
-					.orElseThrow(()-> new RuntimeException(to)));
+		for (String to : mailSendDto.getTo()) {
+			test = (userRepository.findByEmail(to)
+					.orElseThrow(() -> new RuntimeException(to)));
 		}
 		return "done";
 	}
