@@ -22,7 +22,6 @@ export class Compose {
   @Output() closeCompose = new EventEmitter<void>();
   @Input() isComposeOpen: boolean = false;
 
-  fromUserId = signal(0);
   toEmails = signal<string[]>([]);
   toEmailInput = signal('');
   subject = signal('');
@@ -65,11 +64,11 @@ export class Compose {
     this.isSending.set(true);
 
     this.mailService
-      .isValidEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority())
+      .isValidEmail(this.authService.user()?.id || 0, recipients, this.subject(), this.body(), this.priority())
       .pipe(
         switchMap(() =>
           this.mailService.sendEmail(
-            this.fromUserId(),
+            this.authService.user()?.id || 0,
             this.toEmails(),
             this.subject(),
             this.body(),

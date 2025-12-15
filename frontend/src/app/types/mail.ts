@@ -52,3 +52,17 @@ export interface Attachment {
   type: string;
   size: number;
 }
+
+
+export type DraftsResponse = Draft[];
+
+export interface Draft {
+  id: number;
+  subject: string;
+  body: string;
+  receivers: {
+    email: string
+  }[]
+  priority: string
+  attachments: Attachment[]
+}
