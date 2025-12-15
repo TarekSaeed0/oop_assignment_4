@@ -136,13 +136,13 @@
       </div>
 
       <div class="p-2 border-t border-gray-200 flex justify-start items-center gap-2">
-        <button
+        <!-- <button
           (click)="sendEmail()"
           type="button"
           class="bg-green-500 hover:bg-green-600 text-white text-sm font-bold py-2 px-4 rounded-lg transition duration-150 ease-in-out"
         >
           Send
-        </button>
+        </button> -->
         <label
           for="add-attachments"
           title="Add Attachments"
@@ -170,7 +170,7 @@
           (change)="addAttachments($event)"
           class="hidden"
         />
-      <div class="p-2 border-t border-gray-200 flex flex-col justify-start items-start">
+      <div class="p-2 border-gray-200 flex flex-col justify-start items-start">
 
         @if (isitme()) {
           <span class="text-red-600 text-sm font-medium py-2 rounded">
