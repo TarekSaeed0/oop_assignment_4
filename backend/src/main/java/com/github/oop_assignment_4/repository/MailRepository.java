@@ -5,6 +5,7 @@ import com.github.oop_assignment_4.model.UserFolder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.github.oop_assignment_4.model.Mail;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MailRepository extends JpaRepository<Mail, Long> {
@@ -20,4 +21,7 @@ public interface MailRepository extends JpaRepository<Mail, Long> {
 	List<Mail> findByUserIdAndDeletedAtNotNull(Long id);
 
 	void deleteMailById(Long id);
+
+	void deleteByDeletedAtBefore(LocalDateTime expiryDate);
+
 }

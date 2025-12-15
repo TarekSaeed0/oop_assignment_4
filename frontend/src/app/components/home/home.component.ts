@@ -8,8 +8,9 @@ import { CreateFolderDialogComponent } from '../create-folder-dialog/create-fold
 import { UserFolder, UserFolderService } from '../../services/UserFolderService';
 import { CustomFolderComponent } from '../custom-folder/custom-folder';
 import { Compose } from '../compose/compose';
+import { TrashfolderComponent } from '../trashfolder/trashfolder';
 @Component({
-  imports: [RouterLink, Inbox, Sent, Contact, CreateFolderDialogComponent, CustomFolderComponent, Compose],
+  imports: [RouterLink, Inbox, Sent, Contact, CreateFolderDialogComponent, CustomFolderComponent, Compose,TrashfolderComponent],
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',

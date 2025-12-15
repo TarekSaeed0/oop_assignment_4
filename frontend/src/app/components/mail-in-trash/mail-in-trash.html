@@ -1,0 +1,78 @@
+<div class="flex flex-col h-full bg-white font-sans text-gray-800">
+  
+  <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-white">
+    <button (click)="handleBack()" class="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-600" title="Back">
+      <span class="text-xl">←</span>
+    </button>
+    
+    <div class="flex gap-2">
+      <button (click)="onRestore()" class="p-2 hover:bg-green-50 text-green-600 rounded-full transition-colors" title="Restore">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+        </svg>
+      </button>
+
+      <button (click)="onDeleteForever()" class="p-2 hover:bg-red-50 text-red-600 rounded-full transition-colors" title="Delete Forever">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="p-6 overflow-y-auto">
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold mb-2">{{ mail().subject }}</h1>
+      <span [class]="'px-2 py-0.5 rounded text-xs font-bold uppercase ' + 
+        (mail().priority === 'High' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700')">
+        {{ mail().priority }}
+      </span>
+    </div>
+
+    <div class="flex items-start gap-4 mb-6">
+      <div class="size-10 rounded-full bg-gray-200 flex items-center justify-center text-lg font-bold text-gray-600 shrink-0">
+        {{ mail().sender.name.charAt(0).toUpperCase() }}
+      </div>
+
+      <div class="grow min-w-0">
+        <div class="flex items-baseline justify-between">
+            <span class="font-bold text-gray-900">
+                {{ mail().sender.name }} 
+                @if (isSentByMe) { (me) }
+            </span>
+            <span class="text-sm text-gray-500 whitespace-nowrap ml-4">
+                {{ mail().date | date:'medium' }}
+            </span>
+        </div>
+        
+        <div class="text-sm text-gray-500 mb-1">
+            &lt;{{ mail().sender.email }}&gt;
+        </div>
+
+        <div class="text-sm text-gray-600">
+            @for (receiver of mail().receivers; track $index) {
+                <div class="block truncate">
+                    to <span class="font-medium text-gray-800">{{ receiver.name }}</span> 
+                    &lt;{{ receiver.email }}&gt;
+                </div>
+            }
+        </div>
+      </div>
+    </div>
+
+    <div class="prose max-w-none text-gray-800 whitespace-pre-wrap mb-8">
+      {{ mail().body }}
+    </div>
+
+    @if (mail().attachments && mail().attachments.length > 0) {
+        <div class="border-t border-gray-100 pt-4">
+            <h4 class="text-sm font-medium text-gray-500 mb-3">Attachments</h4>
+            <div class="flex flex-wrap gap-2">
+                @for (attachment of mail().attachments; track attachment.name) {
+                    <app-attachment [attachment]="attachment" [preview]="true" />
+                }
+            </div>
+        </div>
+    }
+  </div>
+</div>
