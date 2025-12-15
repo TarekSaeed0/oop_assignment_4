@@ -1,14 +1,14 @@
 package com.github.oop_assignment_4.service;
 
-import com.github.oop_assignment_4.dto.DraftDTO;
-import com.github.oop_assignment_4.dto.UserReferenceDTO;
-import com.github.oop_assignment_4.model.Draft;
-import com.github.oop_assignment_4.model.User;
-import com.github.oop_assignment_4.repository.DraftRepository;
-import com.github.oop_assignment_4.repository.UserRepository;
+import com.github.oop_assignment_4.model.*;
+import com.github.oop_assignment_4.repository.*;
+import com.github.oop_assignment_4.dto.*;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.github.oop_assignment_4.exception.AttachmentNotFoundException;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -19,6 +19,8 @@ public class DraftService {
 
     private final DraftRepository draftRepository;
     private final UserRepository userRepository;
+    @Autowired
+    private AttachmentRepository attachmentRepository;
 
     // Assuming Priority enum is accessible here for conversion
 
@@ -40,6 +42,16 @@ public class DraftService {
                 .map(refDto -> userRepository.findById(refDto.getId())
                         .orElseThrow(() -> new RuntimeException("Receiver ID not found: " + refDto.getId())))
                 .collect(Collectors.toSet());
+
+        // Fetch Attachments
+        Set<Attachment> attachments = new HashSet<>();
+        if (draftDto.getAttachments() != null) {
+            attachments = draftDto.getAttachments().stream()
+                    .map(attachmentDTO -> attachmentRepository
+                            .findById(attachmentDTO.getId()).orElseThrow(
+                                    () -> new AttachmentNotFoundException(attachmentDTO.getId())))
+                    .collect(Collectors.toSet());
+        }
 
         // Build the Entity object
         Draft draft = Draft.builder()
@@ -83,6 +95,26 @@ public class DraftService {
         existingDraft.setSubject(updateDto.getSubject());
         existingDraft.setBody(updateDto.getBody());
         existingDraft.setPriority(Enum.valueOf(com.github.oop_assignment_4.model.Priority.class, updateDto.getPriority()));
+
+        Set<User> updatedReceivers = new HashSet<>();
+        if (updateDto.getReceivers() != null) {
+            updatedReceivers = updateDto.getReceivers().stream()
+                    // Assume getReceivers() returns a list of DTOs with User ID/Ref
+                    .map(refDto -> userRepository.findById(refDto.getId())
+                            .orElseThrow(() -> new RuntimeException("Receiver ID not found: " + refDto.getId())))
+                    .collect(Collectors.toSet());
+        }
+        existingDraft.setReceivers(updatedReceivers);
+
+        Set<Attachment> updatedAttachments = new HashSet<>();
+        if (updateDto.getAttachments() != null) {
+            updatedAttachments = updateDto.getAttachments().stream()
+                    .map(attachmentDTO -> attachmentRepository
+                            .findById(attachmentDTO.getId()).orElseThrow(
+                                    () -> new AttachmentNotFoundException(attachmentDTO.getId())))
+                    .collect(Collectors.toSet());
+        }
+        existingDraft.setAttachments(updatedAttachments);
 
         Draft updatedDraft = draftRepository.save(existingDraft);
 

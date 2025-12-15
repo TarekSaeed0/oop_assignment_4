@@ -1,5 +1,6 @@
 package com.github.oop_assignment_4.dto;
 
+import java.util.List;
 import java.util.Set;
 
 import lombok.AllArgsConstructor;
@@ -19,4 +20,5 @@ public class DraftDTO {
     private String subject;
     private String body;
     private String priority; // Representing Priority enum as a String
+    private List<AttachmentDTO> attachments;
 }
