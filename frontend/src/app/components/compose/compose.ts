@@ -40,9 +40,9 @@ export class Compose {
   isSending = signal(false);
 
   ngOnInit(): void {
-    this.authService.loadUser().subscribe((user) => {
-      if (user) this.fromUserId.set(user.id);
-    });
+    // this.authService.loadUser().subscribe((user) => {
+    //   if (user) this.fromUserId.set(user.id);
+    // });
   }
 
   public closeWindow(): void {
@@ -65,22 +65,49 @@ export class Compose {
     this.isSending.set(true);
 
     this.mailService
-      .isValidEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority())
-      .pipe(
-        switchMap(() => 
-          this.mailService.sendEmail(
-            this.fromUserId(),
-            this.toEmails(),
-            this.subject(),
-            this.body(),
-            this.priority(),
-            this.attachments(),
-          )
-        )
+      .sendEmail(
+        this.fromUserId(),
+        this.toEmails(),
+        this.subject(),
+        this.body(),
+        this.priority(),
+        this.attachments(),
       )
+      // .isValidEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority())
       .subscribe({
-        next: (response:any) => {
-          console.log('✅ Email Sent:', response);
+        next: (checkResponse: any) => {
+          console.log('✅ Validation Passed:', checkResponse);
+
+          this.performSend(recipients);
+        },
+        error: (error: any) => {
+          this.handleError(error);
+          this.isSending.set(false);
+        },
+      });
+  }
+
+  private performSend(recipients: string[]) {
+    this.mailService
+      .sendEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority(), this.attachments())
+      .subscribe({
+        next: (response) => {
+      //.isValidEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority())
+      //.pipe(
+        //switchMap(() => 
+          //this.mailService.sendEmail(
+            //this.fromUserId(),
+            //this.toEmails(),
+            //this.subject(),
+            //this.body(),
+            //this.priority(),
+            //this.attachments(),
+          //)
+        //)
+      //)
+      //.subscribe({
+        //next: (response:any) => {
+          //console.log('✅ Email Sent:', response);
 
           this.clearForm();
           this.isSending.set(false);
@@ -94,7 +121,7 @@ export class Compose {
   }
 
   // Helper to handle the backend error
-  private handleError(error: HttpErrorResponse) {
+  private handleError(error: any) {
     console.error('❌ Validation Failed:', error);
 
     try {
