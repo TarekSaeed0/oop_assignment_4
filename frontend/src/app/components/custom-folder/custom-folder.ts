@@ -39,7 +39,7 @@ export class CustomFolderComponent {
 
     console.log("Mail sende", mail?.data?.senderEmail);
     console.log("Current user :", currentUserEmail);
-    return mail?.data?.senderEmail === currentUserEmail; 
+    return mail?.data?.senderEmail === currentUserEmail;
   });
 
 
@@ -131,7 +131,9 @@ export class CustomFolderComponent {
 
   handleDelete(id: number) {
     this.mailService.deleteMail(id).subscribe({
-      next: () => this.handleRefresh()
+      next: () => {
+        this.handleRefresh()
+      }
     });
   }
 
@@ -144,7 +146,7 @@ export class CustomFolderComponent {
       }
     });
   }
-  
+
   // Placeholder for move logic
   handleBulkMove() {
     console.log("Move logic implementation needed");
@@ -163,5 +165,5 @@ export class CustomFolderComponent {
       });
     }
   }
-  
+
 }

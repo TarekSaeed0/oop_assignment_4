@@ -59,16 +59,23 @@ export class Sent {
   handleFilterChange($event: any) {
     this.filterBy.set($event.target.value)
   }
-  handleDelete = (arg0: number) => {
-    console.log(arg0);
+  // handleDelete = (arg0: number) => {
+  //   console.log(arg0);
 
-    this.mailService.deleteMail(arg0 as number)
-      .subscribe({
-        next: (value) => {
-          console.log(value);
+  //   this.mailService.deleteMail(arg0 as number)
+  //     .subscribe({
+  //       next: (value) => {
+  //         console.log(value);
 
-        }
-      })
+  //       }
+  //     })
+  // }
+    handleDelete(id: number) {
+    this.mailService.deleteMail(id).subscribe({
+      next: () => {
+        this.handleRefresh()
+      }
+    });
   }
   handleNextPage = () => {
     if (this.hasNextPage()) {
@@ -146,8 +153,8 @@ handleMoveToFolder(folderName: string) {
     this.userFolderService.addToFolder(userId, folderName, mailIds).subscribe({
       next: (response) => {
         console.log('Moved successfully', response);
-        this.selectedMail.set([]); 
-        this.handleRefresh();      
+        this.selectedMail.set([]);
+        this.handleRefresh();
       },
       error: (err) => console.error('Move failed', err)
     });

@@ -53,4 +53,9 @@ export class DraftsService {
   getDraft(id: number) {
     return this.http.get(`${this.baseUrl}/draft/${id}`)
   }
+  deleteDraft(id: number) {
+    return this.http.delete(`${this.baseUrl}/${id}`, {
+    responseType: 'text' 
+  })
+  }
 }

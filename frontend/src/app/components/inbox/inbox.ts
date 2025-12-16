@@ -58,14 +58,14 @@ export class Inbox implements OnInit {
   handleFilterChange($event: any) {
     this.filterBy.set($event.target.value)
   }
-  handleDelete = (arg0: number) => {
-    this.mailService.deleteMail(arg0 as number)
-      .subscribe({
-        next: (value) => {
-          console.log(value);
-        }
-      })
-  }
+  // handleDelete = (arg0: number) => {
+  //   this.mailService.deleteMail(arg0 as number)
+  //     .subscribe({
+  //       next: (value) => {
+  //         console.log(value);
+  //       }
+  //     })
+  // }
   handleNextPage = () => {
     if (this.hasNextPage()) {
       this.page.update((p) => p + 1);
@@ -99,6 +99,13 @@ export class Inbox implements OnInit {
     return (this.selectedMail().length == this.inbox().length) && (this.inbox().length != 0)
   }
 
+  handleDelete(id: number) {
+    this.mailService.deleteMail(id).subscribe({
+      next: () => {
+        this.handleRefresh()
+      }
+    });
+  }
   handleBulkDelete() {
     const mailList = this.selectedMail()
     this.mailService.bulkDelete(mailList)
@@ -145,9 +152,9 @@ export class Inbox implements OnInit {
       next: (response) => {
         console.log('Moved successfully', response);
         // Clear selection
-        this.selectedMail.set([]); 
+        this.selectedMail.set([]);
         // Refresh the list
-        this.handleRefresh(); 
+        this.handleRefresh();
       },
       error: (err) => console.error('Move failed', err)
     });

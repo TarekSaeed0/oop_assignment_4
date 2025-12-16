@@ -8,6 +8,7 @@ import { AttachmentComponent } from '../attachment/attachment.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { switchMap } from 'rxjs/operators';
 import {DraftsService} from '../../services/draftsService/drafts-service';
+import { RefreshService } from '../drafts/drafts';
 
 @Component({
   selector: 'app-compose',
@@ -23,7 +24,9 @@ export class Compose {
   @Output() closeCompose = new EventEmitter<void>();
   @Input() isComposeOpen: boolean = false;
 
-fromUserId: WritableSignal<number> = signal(0);  toEmails = signal<string[]>([]);
+  refreshService = inject(RefreshService)
+
+  fromUserId: WritableSignal<number> = signal(0);
   toEmails = signal<string[]>([]);
   toEmailInput = signal('');
   subject = signal('');
@@ -72,6 +75,8 @@ fromUserId: WritableSignal<number> = signal(0);  toEmails = signal<string[]>([])
         next: (res: any) => {
           console.log("draft created", res)
           this.draftId.set(res.id)
+          this.refreshService.handleRefresh()
+          this.closeWindow();
         }
       })
     } else {
@@ -98,6 +103,8 @@ fromUserId: WritableSignal<number> = signal(0);  toEmails = signal<string[]>([])
         .subscribe({
           next: (response: any) => {
             console.log('✅ draft updated:', response);
+            this.refreshService.handleRefresh()
+            this.closeWindow();
           },
           error: (error) => {
             console.error('❌ draft Failed:', error);
@@ -105,7 +112,6 @@ fromUserId: WritableSignal<number> = signal(0);  toEmails = signal<string[]>([])
         });
     }
   }
-
   public closeWindow(): void {
     if(this.body() || this.subject() || this.toEmails().length!=0){
       this.handleSaveDraft()
@@ -147,39 +153,15 @@ fromUserId: WritableSignal<number> = signal(0);  toEmails = signal<string[]>([])
           )
         )
       )
-      this.mailService.isValidEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority())
       .subscribe({
         next: (response: any) => {
           console.log('✅ Email Sent:', response);
 
-          this.performSend(recipients);
-        },
-        error: (error: HttpErrorResponse) => {
-          this.handleError(error);
-          this.isSending.set(false);
-        },
-      });
-  }
-
- // src/app/components/compose/compose.ts
-
-  private performSend(recipients: string[]) {
-    this.mailService
-      .sendEmail(
-        this.fromUserId(),
-        recipients,
-        this.subject(),
-        this.body(),
-        this.priority(),
-        this.attachments() // <--- ADD THIS (The 6th argument)
-      )
-      .subscribe({
-        next: (response) => {
           this.clearForm();
           this.isSending.set(false);
           this.closeWindow();
         },
-        error: (error: HttpErrorResponse) => {
+        error: (error) => {
           console.error('❌ Send Failed:', error);
           this.isSending.set(false);
         },
