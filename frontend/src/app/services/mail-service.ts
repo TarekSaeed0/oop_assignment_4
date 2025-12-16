@@ -74,7 +74,6 @@ export class MailService {
   
 
   // ! Send Email
-  // attachment handling to be added later
   // Use clear parameter names for readability
   public sendEmail(
     userId: number,

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, computed, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, WritableSignal, computed, inject, signal } from '@angular/core';
 import { MailService } from '../../services/mail-service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { FormsModule } from '@angular/forms';
@@ -23,6 +23,7 @@ export class Compose {
   @Output() closeCompose = new EventEmitter<void>();
   @Input() isComposeOpen: boolean = false;
 
+fromUserId: WritableSignal<number> = signal(0);  toEmails = signal<string[]>([]);
   toEmails = signal<string[]>([]);
   toEmailInput = signal('');
   subject = signal('');
@@ -146,15 +147,39 @@ export class Compose {
           )
         )
       )
+      this.mailService.isValidEmail(this.fromUserId(), recipients, this.subject(), this.body(), this.priority())
       .subscribe({
         next: (response: any) => {
           console.log('✅ Email Sent:', response);
 
+          this.performSend(recipients);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.handleError(error);
+          this.isSending.set(false);
+        },
+      });
+  }
+
+ // src/app/components/compose/compose.ts
+
+  private performSend(recipients: string[]) {
+    this.mailService
+      .sendEmail(
+        this.fromUserId(),
+        recipients,
+        this.subject(),
+        this.body(),
+        this.priority(),
+        this.attachments() // <--- ADD THIS (The 6th argument)
+      )
+      .subscribe({
+        next: (response) => {
           this.clearForm();
           this.isSending.set(false);
           this.closeWindow();
         },
-        error: (error) => {
+        error: (error: HttpErrorResponse) => {
           console.error('❌ Send Failed:', error);
           this.isSending.set(false);
         },
