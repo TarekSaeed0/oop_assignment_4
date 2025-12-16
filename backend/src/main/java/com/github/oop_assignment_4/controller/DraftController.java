@@ -52,6 +52,13 @@ public class DraftController {
         return new ResponseEntity<>(drafts, HttpStatus.OK);
     }
 
+    @GetMapping("draft/{id}")
+    public ResponseEntity<DraftDTO> getDraft(@PathVariable Long id) {
+        DraftDTO draft = draftService.getDraft(id);
+
+        return new ResponseEntity<>(draft, HttpStatus.OK);
+    }
+
     /**
      * PUT /api/drafts/{id}
      * Updates an existing draft.
@@ -61,15 +68,11 @@ public class DraftController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<DraftDTO> updateDraft(@PathVariable Long id, @RequestBody DraftDTO draftDto) {
-        try {
-            // Service handles updating the existing entity and returns the updated DTO
-            DraftDTO updatedDraft = draftService.updateDraft(id, draftDto);
-            return new ResponseEntity<>(updatedDraft, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            // Assuming RuntimeException here is due to "Draft not found"
-            System.err.println("Error updating draft: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+
+        // Service handles updating the existing entity and returns the updated DTO
+        DraftDTO updatedDraft = draftService.updateDraft(id, draftDto);
+        return new ResponseEntity<>(updatedDraft, HttpStatus.OK);
+
     }
 
     /**
@@ -83,4 +86,6 @@ public class DraftController {
             String msg = draftService.deleteDraft(id);
             return new ResponseEntity<>(msg,HttpStatus.OK);
     }
+
+
 }

@@ -221,7 +221,7 @@
       </nav>
     </aside>
 
-    <main class="bg-white grow rounded-2xl overflow-hidden shadow-lg">
+    <main class="bg-white grow rounded-2xl overflow-hidden shadow-lg relative">
       @if (selectedFolder() == 'Inbox') {
         <app-inbox [userFolders]="userFolders"></app-inbox>
       } @else if (selectedFolder() == 'Sent') {
@@ -246,3 +246,4 @@
 </div>
 
 <app-compose [isComposeOpen]="isComposeOpen" (closeCompose)="isComposeOpen = false"></app-compose>
+

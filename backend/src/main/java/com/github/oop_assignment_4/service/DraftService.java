@@ -39,7 +39,7 @@ public class DraftService {
                 .orElseThrow(() -> new RuntimeException("Sender not found: " + draftDto.getSenderEmail()));
 
         Set<User> receivers = draftDto.getReceivers().stream()
-                .map(refDto -> userRepository.findById(refDto.getId())
+                .map(refDto -> userRepository.findByEmail(refDto.getEmail())
                         .orElseThrow(() -> new RuntimeException("Receiver ID not found: " + refDto.getId())))
                 .collect(Collectors.toSet());
 
@@ -100,7 +100,7 @@ public class DraftService {
         if (updateDto.getReceivers() != null) {
             updatedReceivers = updateDto.getReceivers().stream()
                     // Assume getReceivers() returns a list of DTOs with User ID/Ref
-                    .map(refDto -> userRepository.findById(refDto.getId())
+                    .map(refDto -> userRepository.findByEmail(refDto.getEmail())
                             .orElseThrow(() -> new RuntimeException("Receiver ID not found: " + refDto.getId())))
                     .collect(Collectors.toSet());
         }
@@ -126,6 +126,13 @@ public class DraftService {
     public String deleteDraft(Long id) {
         draftRepository.deleteById(id);
         return "Successfully deleted ✅";
+    }
+
+    @Transactional
+    public DraftDTO getDraft(Long id) {
+        Draft draft = draftRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("draft not found"));
+        return DraftMapper.toDto(draft);
     }
 }
 class DraftMapper {
@@ -158,4 +165,6 @@ class DraftMapper {
                 .email(user.getEmail())
                 .build();
     }
+
+
 }

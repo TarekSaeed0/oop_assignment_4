@@ -196,7 +196,26 @@
             }
           </div>
         }
+
+
+          @if (userNotFound()) {
+            <span class="text-red-600 text-sm font-medium">
+                ❌ {{ userNotFound() }} email doesn't exist
+              </span>
+          }
+        </div>
+        <div class="flex items-center gap-4">
+          <button
+            (click)="handleSaveDraft()"
+            [disabled]="isSending()"
+            type="button"
+            class="bg-green-600 hover:bg-green-700 disabled:bg-blue-400 text-white text-sm font-medium py-2 px-4 rounded transition duration-150 ease-in-out"
+          >
+            @if (draftId() == null) {save as draft}
+            @else {update draft}
+          </button>
       </div>
     </div>
   </div>
+</div>
 </div>

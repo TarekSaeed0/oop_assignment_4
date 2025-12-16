@@ -1,33 +1,35 @@
-import {AfterViewInit, Component, signal} from '@angular/core';
+import {AfterViewInit, Component, inject, signal} from '@angular/core';
 import {HomeComponent} from '../home/home.component';
 import {DatePipe, SlicePipe} from '@angular/common';
 import {MailInbox} from '../mail-inbox/mail-inbox';
 import {MoveToMenuComponent} from '../move-to-menu/move-to-menu';
 import {DraftsResponse} from '../../types/mail';
+import {DraftsService} from '../../services/draftsService/drafts-service';
+import {Compose} from '../compose/compose';
 
 @Component({
   selector: 'app-drafts',
   imports: [
-    DatePipe,
-    MailInbox,
-    MoveToMenuComponent,
-    SlicePipe
+    SlicePipe,
   ],
   templateUrl: './drafts.html',
   styleUrl: './drafts.css',
 })
 export class Drafts implements AfterViewInit{
   homeComponent: undefined | HomeComponent;
+  compose: Compose | undefined;
   constructor(homeComponent: HomeComponent) {
     this.homeComponent = homeComponent
+    // this.compose = compose
+    // console.log(compose.draftId())
     homeComponent.closeCompose();
   }
   drafts = signal<DraftsResponse>([])
   currentDraftId = signal<number | null>(null);
   selectedDrafts = signal<number[]>([])
-
+  draftService = inject(DraftsService)
   ngAfterViewInit(): void {
-    if(this.currentDraftId() != null) {
+    if(this.currentDraftId() == null) {
       this.handleRefresh()
     }
   }
@@ -40,7 +42,12 @@ export class Drafts implements AfterViewInit{
   }
 
   handleRefresh() {
-
+    this.draftService.getDrafts().subscribe({
+      next: (data: any) => {
+        console.log(data)
+        this.drafts.set(data as any)
+      }
+    })
   }
 
   handleBulkDelete() {
@@ -53,7 +60,7 @@ export class Drafts implements AfterViewInit{
   }
 
   handleClickDraft(id: number) {
-
+    this.draftService.putDraft(id)
   }
 
   handleCheckDraft(id: number) {

@@ -3,10 +3,11 @@ import { MailService } from '../../services/mail-service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { FormsModule } from '@angular/forms';
 import { AttachmentService } from '../../services/attachment.service';
-import { Attachment } from '../../types/mail';
+import {Attachment, Draft} from '../../types/mail';
 import { AttachmentComponent } from '../attachment/attachment.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { switchMap } from 'rxjs/operators';
+import {DraftsService} from '../../services/draftsService/drafts-service';
 
 @Component({
   selector: 'app-compose',
@@ -18,7 +19,7 @@ export class Compose {
   private mailService = inject(MailService);
   private authService = inject(AuthenticationService);
   private attachmentService = inject(AttachmentService);
-
+  private draftService = inject(DraftsService)
   @Output() closeCompose = new EventEmitter<void>();
   @Input() isComposeOpen: boolean = false;
 
@@ -28,7 +29,7 @@ export class Compose {
   body = signal('');
   priority = signal('NORMAL');
   attachments = signal<Attachment[]>([]);
-
+  draftId = signal<number | null>(null)
   isUploadingAttachments = false;
   error = null;
 
@@ -39,12 +40,80 @@ export class Compose {
   isSending = signal(false);
 
   ngOnInit(): void {
-    // this.authService.loadUser().subscribe((user) => {
-    //   if (user) this.fromUserId.set(user.id);
-    // });
+    this.draftService.putDraft$.subscribe((draftId) => {
+      this.draftId.set(draftId)
+      this.draftService.getDraft(draftId)
+        .subscribe({
+          next: (data) => {
+            const draftData = data as Draft
+            this.subject.set(draftData.subject)
+            this.priority.set(draftData.priority)
+            this.body.set(draftData.body)
+            this.toEmails.set(draftData.receivers.map((rec) => rec.email))
+            this.attachments.set(draftData.attachments)
+            this.isComposeOpen = true
+          }
+        })
+    })
+  }
+  handleSaveDraft() {
+    if(this.draftId() == null) {
+      this.mailService.isValidEmail(this.authService.user()?.id || 0, this.toEmails(), this.subject(), this.body(), this.priority())
+        .pipe(switchMap(() =>
+          this.draftService.createDraft(
+            this.body(),
+            this.subject(),
+            this.toEmails().map(email => {return {email}}),
+            this.priority(),
+            this.attachments()
+          )))
+      .subscribe({
+        next: (res: any) => {
+          console.log("draft created", res)
+          this.draftId.set(res.id)
+        }
+      })
+    } else {
+      const tempId = this.draftId()
+      const tempBody = this.body()
+      const tempSubject =   this.subject()
+      const tempTo =   this.toEmails().map(email => {return {email}})
+      const tempP =   this.priority()
+      const tempAtt =   this.attachments()
+      this.mailService
+        .isValidEmail(this.authService.user()?.id || 0, this.toEmails(), this.subject(), this.body(), this.priority())
+        .pipe(
+          switchMap(() =>
+            this.draftService.updateDraft(
+              tempId as number,
+              tempBody,
+              tempSubject,
+              tempTo,
+              tempP,
+              tempAtt
+            )
+          )
+        )
+        .subscribe({
+          next: (response: any) => {
+            console.log('✅ draft updated:', response);
+          },
+          error: (error) => {
+            console.error('❌ draft Failed:', error);
+          },
+        });
+    }
   }
 
   public closeWindow(): void {
+    if(this.body() || this.subject() || this.toEmails().length!=0){
+      this.handleSaveDraft()
+    }
+    this.body.set("")
+    this.subject.set("")
+    this.toEmails.set([])
+    this.draftId.set(null)
+    this.isComposeOpen = false
     this.closeCompose.emit();
   }
 
