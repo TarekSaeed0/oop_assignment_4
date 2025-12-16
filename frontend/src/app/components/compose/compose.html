@@ -134,37 +134,48 @@
         }
       </div>
 
-      <div class="p-2 border-t border-gray-200 flex flex-col justify-start items-start gap-2">
-        
-        <div class="flex items-center gap-2 w-full">
-            <label
-            for="add-attachments"
-            title="Add Attachments"
-            class="p-1.25 rounded-full text-gray-700 hover:bg-gray-100 active:bg-gray-200 focus:outline-none transition-colors duration-400 cursor-pointer"
-            >
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-5"
-            >
-                <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"
-                />
-            </svg>
-            </label>
-            <input
-            id="add-attachments"
-            type="file"
-            multiple
-            (change)="addAttachments($event)"
-            class="hidden"
+      <div class="p-2 border-t border-gray-200 flex justify-start items-center gap-2">
+        <!-- <button
+          (click)="sendEmail()"
+          type="button"
+          class="bg-green-500 hover:bg-green-600 text-white text-sm font-bold py-2 px-4 rounded-lg transition duration-150 ease-in-out"
+        >
+          Send
+        </button> -->
+        <label
+          for="add-attachments"
+          title="Add Attachments"
+          class="p-1.25 rounded-full text-gray-700 hover:bg-gray-100 active:bg-gray-200 focus:outline-none transition-colors duration-400 cursor-pointer"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"
             />
-        </div>
+          </svg>
+        </label>
+        <input
+          id="add-attachments"
+          type="file"
+          multiple
+          (change)="addAttachments($event)"
+          class="hidden"
+        />
+      <div class="p-2 border-gray-200 flex flex-col justify-start items-start">
+
+        @if (isitme()) {
+          <span class="text-red-600 text-sm font-medium py-2 rounded">
+            ❌ You cannot send an email to yourself.
+          </span>
+        }
 
         <div class="w-full">
             @if (isitme()) {
@@ -189,9 +200,28 @@
                 }
             </div>
             }
-        </div>
+          </div>
+        }
 
+
+          @if (userNotFound()) {
+            <span class="text-red-600 text-sm font-medium">
+                ❌ {{ userNotFound() }} email doesn't exist
+              </span>
+          }
+        </div>
+        <div class="flex items-center gap-4">
+          <button
+            (click)="handleSaveDraft()"
+            [disabled]="isSending()"
+            type="button"
+            class="bg-green-600 hover:bg-green-700 disabled:bg-blue-400 text-white text-sm font-medium py-2 px-4 rounded transition duration-150 ease-in-out"
+          >
+            @if (draftId() == null) {save as draft}
+            @else {update draft}
+          </button>
       </div>
     </div>
   </div>
+</div>
 </div>
