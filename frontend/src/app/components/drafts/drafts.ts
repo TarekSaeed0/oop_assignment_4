@@ -5,7 +5,25 @@ import {MailInbox} from '../mail-inbox/mail-inbox';
 import {MoveToMenuComponent} from '../move-to-menu/move-to-menu';
 import {DraftsResponse} from '../../types/mail';
 import {DraftsService} from '../../services/draftsService/drafts-service';
-import {Compose} from '../compose/compose';
+import {Compose} from '../compose/compose'; // start
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class RefreshService {
+  draftService = inject(DraftsService)
+  drafts = signal<DraftsResponse>([]);
+
+  handleRefresh() {
+    this.draftService.getDrafts().subscribe({
+      next: (data: any) => {
+        console.log(data)
+        this.drafts.set(data as any)
+      }
+    })
+  }
+}
 
 @Component({
   selector: 'app-drafts',
@@ -24,30 +42,35 @@ export class Drafts implements AfterViewInit{
     // console.log(compose.draftId())
     homeComponent.closeCompose();
   }
-  drafts = signal<DraftsResponse>([])
+  refreshService = inject(RefreshService)
+  // drafts = signal<DraftsResponse>([])
+  drafts = this.refreshService.drafts
   currentDraftId = signal<number | null>(null);
   selectedDrafts = signal<number[]>([])
   draftService = inject(DraftsService)
   ngAfterViewInit(): void {
     if(this.currentDraftId() == null) {
-      this.handleRefresh()
+      this.refreshService.handleRefresh()
     }
   }
   isAllSelected() {
-    return this.selectedDrafts().length == this.drafts().length && this.drafts().length != 0
+    return this.selectedDrafts().length == this.refreshService.drafts().length && this.refreshService.drafts().length != 0
   }
 
   handleSelectAll() {
-    this.selectedDrafts.set(this.drafts().map((draft) => draft.id))
+    this.selectedDrafts.set(this.refreshService.drafts().map((draft) => draft.id))
   }
 
+  // handleRefresh() {
+  //   this.draftService.getDrafts().subscribe({
+  //     next: (data: any) => {
+  //       console.log(data)
+  //       this.drafts.set(data as any)
+  //     }
+  //   })
+  // }
   handleRefresh() {
-    this.draftService.getDrafts().subscribe({
-      next: (data: any) => {
-        console.log(data)
-        this.drafts.set(data as any)
-      }
-    })
+    this.refreshService.handleRefresh();
   }
 
   handleBulkDelete() {
@@ -56,7 +79,11 @@ export class Drafts implements AfterViewInit{
 
 
   handleDeleteDraft(id: number) {
-
+    this.draftService.deleteDraft(id).subscribe({
+      next: () => {
+        this.refreshService.handleRefresh()
+      }
+    });
   }
 
   handleClickDraft(id: number) {

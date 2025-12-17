@@ -224,16 +224,14 @@
     <main class="bg-white grow rounded-2xl overflow-hidden shadow-lg relative">
       @if (selectedFolder() == 'Inbox') {
         <app-inbox [userFolders]="userFolders"></app-inbox>
-      } 
+      }
       @else if (selectedFolder() == 'Sent') {
         <app-sent [userFolders]="userFolders"></app-sent>
-      } 
-      
+      }
+
       @else if (selectedFolder() == 'Trash') {
         <app-trashfolder [searchBy]="searchBy()"></app-trashfolder>
-      } 
-      
-       @else if (selectedFolder() == 'Drafts') {
+      } @else if (selectedFolder() == 'Drafts') {
 
         <app-drafts />
       }
