@@ -71,7 +71,7 @@ public class AttachmentService {
 		}
 	}
 
-	public Resource downloadAttachment(Long id) {
+	public Resource getAttachmentResource(Long id) {
 		Attachment attachment = attachmentRepository.findById(id)
 				.orElseThrow(() -> new AttachmentNotFoundException(id));
 
@@ -96,18 +96,5 @@ public class AttachmentService {
 	public AttachmentDTO getAttachment(Long id) {
 		return attachmentRepository.findById(id).map(attachmentMapper::toDTO)
 				.orElseThrow(() -> new AttachmentNotFoundException(id));
-	}
-
-	public void deleteAttachment(Long id) {
-		Attachment attachment = attachmentRepository.findById(id)
-				.orElseThrow(() -> new AttachmentNotFoundException(id));
-
-		try {
-			Path path = Paths.get(attachment.getPath());
-			Files.deleteIfExists(path);
-			attachmentRepository.deleteById(id);
-		} catch (IOException e) {
-			throw new AttachmentStorageException("Failed to delete attachment.");
-		}
 	}
 }

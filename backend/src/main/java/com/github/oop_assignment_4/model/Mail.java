@@ -2,7 +2,6 @@ package com.github.oop_assignment_4.model;
 
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,12 +29,9 @@ public class Mail {
 	@JoinColumn(name = "mail_data_id", nullable = false)
 	private MailData data;
 
-
 	@ManyToOne
 	@JoinColumn(name = "user_folder_id")
 	private UserFolder userFolder;
 
 	private LocalDateTime deletedAt;
-
-
 }

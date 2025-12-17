@@ -1,5 +1,6 @@
 package com.github.oop_assignment_4.service;
 
+import com.github.oop_assignment_4.dto.MailResponse;
 import com.github.oop_assignment_4.dto.MailToFolderRequest;
 import com.github.oop_assignment_4.model.Mail;
 import com.github.oop_assignment_4.model.User;
@@ -21,6 +22,8 @@ public class UserFolderService {
     UserRepository userRepository;
     @Autowired
     MailRepository mailRepository;
+    @Autowired
+    private MailService mailService;
 
     public Boolean isValidNameForUserFolder(String folderName, Long userId) {
 
@@ -102,4 +105,35 @@ public class UserFolderService {
             mailRepository.save(mail);
         }
     }
+
+    public void deleteFolder(Long userId,String folderName) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User Not Found"));
+
+        UserFolder userFolder = userFolderRepository
+                .findByNameAndUser(folderName, user)
+                .orElseThrow(() -> new RuntimeException("There is no folder with such name"));
+        List<MailResponse> mails = mailService.getMailsByUserIdAndFolderName(userId, folderName);
+       for(MailResponse mailr : mails) {
+           Long mailId=mailr.id();
+           Mail mail = mailRepository.findById(mailId).orElseThrow();
+           mail.setUserFolder(null);
+           mailRepository.save(mail);
+       }
+       userFolderRepository.delete(userFolder);
+    }
+    public void renameFolder(Long userId,String oldFolderName,String newFolderName) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User Not Found"));
+
+        UserFolder userFolder = userFolderRepository
+                .findByNameAndUser(oldFolderName, user)
+                .orElseThrow(() -> new RuntimeException("There is no folder with such name"));
+        userFolder.setName(newFolderName);
+        userFolderRepository.save(userFolder);
+    }
+
+    
+
 }

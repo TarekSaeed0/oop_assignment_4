@@ -3,10 +3,11 @@ import { MailService } from '../../services/mail-service';
 import { InboxMail } from '../../types/mail';
 import { CommonModule } from '@angular/common';
 import { AuthenticationService } from '../../services/authentication.service';
+import { AttachmentComponent } from "../attachment/attachment.component";
 
 @Component({
   selector: 'app-mail-inbox',
-  imports: [],
+  imports: [AttachmentComponent],
   templateUrl: './mail-inbox.html',
   styleUrl: './mail-inbox.css',
 })

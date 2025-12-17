@@ -1,8 +1,8 @@
 <div class="compose-component">
   <div
     id="compose-window"
-    class="compose-window flex flex-col bg-white rounded-t-lg shadow-2xl border border-gray-200"
-    [class.hidden1]="!isComposeOpen"
+    class="compose-window hidden flex-col bg-white rounded-t-lg shadow-2xl border border-gray-200"
+    [class.!flex]="isComposeOpen"
   >
     <div
       class="flex justify-between items-center px-4 py-2 bg-gray-700 text-white rounded-t-lg cursor-move"
@@ -16,12 +16,13 @@
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
             fill="none"
             viewBox="0 0 24 24"
+            stroke-width="1.5"
             stroke="currentColor"
+            class="size-5"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
           </svg>
         </button>
         <button
@@ -32,37 +33,41 @@
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
             fill="none"
             viewBox="0 0 24 24"
+            stroke-width="1.5"
             stroke="currentColor"
+            class="size-5"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
     </div>
 
-    <!-- ! form -->
     <div class="flex flex-col grow p-0">
       <div class="border-b border-gray-200 flex items-start p-2">
         <div class="flex flex-wrap items-center grow space-x-2">
           @for (e of toEmails(); track $index) {
           <span
-            class="flex items-center bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full mb-1"
+            class="flex items-center bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full mb-1"
           >
             {{ e }}
             <button
               (click)="removeEmail($index)"
-              class="ml-1 text-blue-600 hover:text-blue-900 focus:outline-none leading-none"
+              class="ml-1 text-green-600 hover:text-green-900 focus:outline-none leading-none"
               title="Remove email"
             >
-              &times;
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="3"
+                stroke="currentColor"
+                class="size-3"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
             </button>
           </span>
           }
@@ -71,7 +76,7 @@
             type="text"
             placeholder="Add recipients..."
             [(ngModel)]="toEmailInput"
-            class="grow min-w-[200px] px-2 py-1 border-none focus:ring-0 focus:outline-none text-sm text-gray-700"
+            class="grow min-w-[200px] px-2 py-1 border-none focus:ring-0 focus:outline-none text-sm placeholder-gray-400"
             required
           />
         </div>
@@ -83,48 +88,132 @@
           Add Email
         </button>
       </div>
+
       <div class="border-b border-gray-200">
         <input
           type="text"
           placeholder="Subject"
           [(ngModel)]="subject"
-          class="w-full px-4 py-2 border-none focus:ring-0 focus:outline-none text-sm"
+          class="w-full px-4 py-2 border-none focus:ring-0 focus:outline-none text-sm placeholder-gray-400"
         />
+      </div>
+
+      <div class="border-b border-gray-200 flex items-center px-4 py-2 text-sm text-gray-600">
+        <label for="priority-select" class="font-medium mr-2">Priority:</label>
+        <select
+          id="priority-select"
+          [(ngModel)]="priority"
+          class="border border-gray-300 rounded-md py-1 px-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+        >
+          <option value="NORMAL">NORMAL</option>
+          <option value="LOW">LOW</option>
+          <option value="HIGH">HIGH</option>
+          <option value="URGENT">URGENT</option>
+        </select>
       </div>
 
       <textarea
         placeholder="Message Body"
         [(ngModel)]="body"
-        class="grow w-full px-4 py-2 border-none focus:ring-0 focus:outline-none resize-none text-sm"
+        class="grow w-full px-4 py-2 border-none focus:ring-0 focus:outline-none resize-none text-sm placeholder-gray-400"
       ></textarea>
 
-      <div class="p-2 border-t border-gray-200 flex flex-col justify-start items-start">
-        
-        @if (isitme()) {
-          <span class="text-red-600 text-sm font-medium py-2 rounded">
-            ❌ You cannot send an email to yourself.
-          </span>
-        } 
-        
-        @else {
-          <div class="flex items-center gap-4">
-            <button
-              (click)="sendEmail()"
-              [disabled]="isSending()"
-              type="button"
-              class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium py-2 px-4 rounded transition duration-150 ease-in-out"
-            >
-              @if(isSending()) { Sending... } @else { Send }
-            </button>
+      <div class="flex flex-wrap gap-2 p-2">
+        @for (attachment of attachments(); track attachment.name) {
+        <app-attachment
+          [attachment]="attachment"
+          [removable]="true"
+          (onRemove)="removeAttachment($event)"
+        />
+        } @if (isUploadingAttachments) {
+        <div
+          class="size-6 animate-spin inline-block border-3 border-gray-300 border-r-transparent rounded-full"
+        ></div>
+        } @if (error) {
+        <div class="text-red-500 text-sm text-center">{{ error }}</div>
+        }
+      </div>
 
-            @if (userNotFound()) {
-              <span class="text-red-600 text-sm font-medium">
-                ❌ {{ userNotFound() }} email doesn't exist
-              </span>
+      <div class="p-2 border-t border-gray-200 flex justify-start items-center gap-2">
+        <!-- <button
+          (click)="sendEmail()"
+          type="button"
+          class="bg-green-500 hover:bg-green-600 text-white text-sm font-bold py-2 px-4 rounded-lg transition duration-150 ease-in-out"
+        >
+          Send
+        </button> -->
+        <label
+          for="add-attachments"
+          title="Add Attachments"
+          class="p-1.25 rounded-full text-gray-700 hover:bg-gray-100 active:bg-gray-200 focus:outline-none transition-colors duration-400 cursor-pointer"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"
+            />
+          </svg>
+        </label>
+        <input
+          id="add-attachments"
+          type="file"
+          multiple
+          (change)="addAttachments($event)"
+          class="hidden"
+        />
+      <div class="p-2 border-gray-200 flex flex-col justify-start items-start">
+        <div class="w-full">
+            @if (isitme()) {
+            <span class="text-red-600 text-sm font-medium py-2 rounded">
+                ❌ You cannot send an email to yourself.
+            </span>
+            } @else {
+            <div class="flex items-center gap-4">
+                <button
+                (click)="sendEmail()"
+                [disabled]="isSending()"
+                type="button"
+                class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium py-2 px-4 rounded transition duration-150 ease-in-out"
+                >
+                @if(isSending()) { Sending... } @else { Send }
+                </button>
+
+                @if (userNotFound()) {
+                <span class="text-red-600 text-sm font-medium">
+                    ❌ {{ userNotFound() }} email doesn't exist
+                </span>
+                }
+            </div>
             }
           </div>
-        }
+
+
+          @if (userNotFound()) {
+            <span class="text-red-600 text-sm font-medium">
+                ❌ {{ userNotFound() }} email doesn't exist
+              </span>
+          }
+        </div>
+        <div class="flex items-center gap-4">
+          <button
+            (click)="handleSaveDraft()"
+            [disabled]="isSending()"
+            type="button"
+            class="bg-green-600 hover:bg-green-700 disabled:bg-blue-400 text-white text-sm font-medium py-2 px-4 rounded transition duration-150 ease-in-out"
+          >
+            @if (draftId() == null) {save as draft}
+            @else {update draft}
+          </button>
       </div>
     </div>
   </div>
+</div>
 </div>

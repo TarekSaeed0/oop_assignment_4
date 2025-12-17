@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class AttachmentDTO {
   private Long id;
   private String name;
-  private String path;
+	private String type;
+	private Long size;
 }
