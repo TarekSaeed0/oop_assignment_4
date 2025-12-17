@@ -142,4 +142,29 @@ handleRefresh() {
       return `From: ${mail.sender.name}`;
     }
   }
+
+handleNextPage() {
+    if (this.hasNextPage()) {
+      this.page++;
+      this.handleRefresh();
+    }
+  }
+
+  handlePrevPage() {
+    if (this.hasPrevPage()) {
+      this.page--;
+      this.handleRefresh();
+    }
+  }
+
+  hasPrevPage(): boolean {
+    return this.page > 1;
+  }
+
+  hasNextPage(): boolean {
+    // If the list is full (10 items), assume there might be a next page.
+    // If it's less than 10, we are definitely at the end.
+    return this.mails().length === this.size;
+  }
+
 }

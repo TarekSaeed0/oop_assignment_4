@@ -21,7 +21,7 @@ public class MailServiceProxy extends MailService{
 	@Transactional
 	public List<InboxMailDTO> getInbox(InboxRequest inboxRequest){
 		List<Mail> deletedMail = mailRepository.findByUserIdAndDeletedAtNotNull(inboxRequest.getUserId());
-		LocalDateTime limit = LocalDateTime.now().minusMinutes(3);
+		LocalDateTime limit = LocalDateTime.now().minusMinutes(3);//because 30 days are reallu long time
 		for(Mail mail: deletedMail) {
 			if(mail.getDeletedAt().isBefore(limit)){
 				System.out.println("deleted" + mail.getId());
