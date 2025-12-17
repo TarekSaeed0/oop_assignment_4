@@ -149,7 +149,7 @@ export class Compose {
             this.subject(),
             this.body(),
             this.priority(),
-            this.attachments(),
+            this.attachments() || [],
           )
         )
       )
@@ -160,12 +160,24 @@ export class Compose {
           this.clearForm();
           this.isSending.set(false);
           this.closeWindow();
+          this.mailService.triggerRefreshAfterCompose()
         },
         error: (error) => {
           console.error('❌ Send Failed:', error);
           this.isSending.set(false);
         },
       });
+    if(this.draftId() != null) {
+      this.draftService.deleteDraft(this.draftId() as number)
+        .subscribe({
+          next: (res) => {
+            this.draftId.set(null)
+            this.mailService.triggerRefreshAfterCompose()
+          }
+        })
+    }
+
+
   }
 
   // Helper to handle the backend error

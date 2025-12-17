@@ -34,8 +34,8 @@
       <span class="group-hover:scale-110 transition-transform inline-block">🗑️</span>
     </button>
 
-    <app-move-to-menu 
-      [userFolders]="userFolders" 
+    <app-move-to-menu
+      [userFolders]="userFolders"
       (folderChange)="handleMoveToFolder($event)">
     </app-move-to-menu>
 
@@ -89,7 +89,7 @@
               (change)="handleSortChange($event)"
             >
               <option value="date">Date</option>
-              <option value="sender">Sender</option>
+<!--              <option value="sender">Sender</option>-->
               <option value="subject">Subject</option>
               <option value="priority">Priority</option>
             </select>

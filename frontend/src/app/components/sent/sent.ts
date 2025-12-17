@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal,Input } from '@angular/core';
+import {Component, effect, inject, signal, Input, OnInit} from '@angular/core';
 import { MailService } from '../../services/mail-service';
 import { InboxMailResponce, SentMailResponce } from '../../types/mail';
 import { MailInbox } from "../mail-inbox/mail-inbox";
@@ -15,7 +15,7 @@ import { UserFolder, UserFolderService } from '../../services/UserFolderService'
   templateUrl: './sent.html',
   styleUrl: './sent.css',
 })
-export class Sent {
+export class Sent implements OnInit{
   private userFolderService = inject(UserFolderService); // Inject this
   private authServicee = inject(AuthenticationService);//i know its a duplicate
   mailService = inject(MailService)
@@ -30,6 +30,17 @@ export class Sent {
       this.handleRefresh()
     })
   }
+
+  ngOnInit(): void {
+    this.mailService.refreshAfterComposeObservable
+      .subscribe(
+         () => {
+           console.log("refreshed in sent")
+           this.handleRefresh()
+        }
+      )
+  }
+
   handleRefresh = () => {
     if (this.currentMailId() == null) {
       this.mailService.getSent(this.authService?.user()?.id || 0, this.page(), this.size(),
@@ -59,21 +70,10 @@ export class Sent {
   handleFilterChange($event: any) {
     this.filterBy.set($event.target.value)
   }
-  // handleDelete = (arg0: number) => {
-  //   console.log(arg0);
-
-  //   this.mailService.deleteMail(arg0 as number)
-  //     .subscribe({
-  //       next: (value) => {
-  //         console.log(value);
-
-  //       }
-  //     })
-  // }
-    handleDelete(id: number) {
-    this.mailService.deleteMail(id).subscribe({
-      next: () => {
-        this.handleRefresh()
+  handleDelete(id: number) {
+  this.mailService.deleteMail(id).subscribe({
+    next: () => {
+      this.handleRefresh()
       }
     });
   }
@@ -95,10 +95,7 @@ export class Sent {
       this.handleRefresh()
     }
   }
-  getPageInfo() {
-  }
-  handleBulkMove() {
-  }
+
   handleSelectAll = () => {
     if (this.isAllSelected()) {
       this.selectedMail.set([])
@@ -123,9 +120,7 @@ export class Sent {
   }
 
   sent = signal<SentMailResponce>([])
-  selectMail(id: number) {
-    this.currentMailId.set(id)
-  }
+
   currentMailId = signal<null | number>(null);
   page = signal<number>(1);
   size = signal<number>(10);
@@ -159,5 +154,6 @@ handleMoveToFolder(folderName: string) {
       error: (err) => console.error('Move failed', err)
     });
   }
+
 
 }

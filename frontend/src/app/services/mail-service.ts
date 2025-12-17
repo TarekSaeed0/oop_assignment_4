@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Attachment } from '../types/mail';
+import {Subject} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -71,7 +72,7 @@ export class MailService {
       },
     });
   }
-  
+
 
   // ! Send Email
   // Use clear parameter names for readability
@@ -111,5 +112,12 @@ export class MailService {
     return this.http.post(`${this.baseUrl}check`, payload, {
         responseType: 'text' as 'json' // Angular requires this type assertion for 'text'
     });
+  }
+
+  refreshAfterCompose = new Subject<void>();
+  refreshAfterComposeObservable = this.refreshAfterCompose.asObservable()
+
+  triggerRefreshAfterCompose() {
+    this.refreshAfterCompose.next();
   }
 }
