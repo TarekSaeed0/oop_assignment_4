@@ -40,7 +40,6 @@
       <div
         title="contacts"
         class="p-1 rounded-full hover:bg-gray-100 active:bg-gray-200 focus:outline-none transition-colors duration-400"
-
       >
         <button
           id="contact-menu-button"
@@ -78,7 +77,7 @@
           (click)="toggleUserMenu()"
           [title]="userMenuButtonTitle()"
           class="size-10 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold cursor-pointer"
-          >
+        >
           {{ userInitials() }}
         </button>
       </div>
@@ -140,7 +139,8 @@
             <a
               [title]="folder.name"
               (click)="changeFolder(folder.name)"
-              [class]="`flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700
+              [class]="
+                `flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700
               hover:bg-gray-100 transition-colors cursor-pointer
               ${selectedFolder() == folder.name ? 'bg-gray-300' : ''}`
               "
@@ -156,12 +156,6 @@
                 <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="folder.icon" />
               </svg>
               <span>{{ folder.name }}</span>
-              @if (folder.count > 0) {
-                <span
-                  class="ml-auto text-xs font-bold bg-green-500 text-white px-2 py-0.5 rounded-full"
-                  >{{ folder.count }}</span
-                >
-              }
             </a>
           }
         </div>
@@ -187,9 +181,10 @@
         </div>
         <div class="space-y-1 mt-1">
           @for (uFolder of userFolders; track uFolder.id) {
-            <div class="group relative flex items-center pr-2 rounded-lg hover:bg-gray-100 transition-colors"
-                 [class.bg-green-100]="selectedFolder() === uFolder.name">
-                 
+            <div
+              class="group relative flex items-center pr-2 rounded-lg hover:bg-gray-100 transition-colors"
+              [class.bg-green-100]="selectedFolder() === uFolder.name"
+            >
               <button
                 type="button"
                 [title]="uFolder.name"
@@ -197,33 +192,63 @@
                 [class.text-green-700]="selectedFolder() === uFolder.name"
                 (click)="changeFolder(uFolder.name!)"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 shrink-0">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-5 shrink-0"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"
+                  />
                 </svg>
                 <span class="truncate grow">{{ uFolder.name }}</span>
               </button>
 
               <div class="hidden group-hover:flex items-center gap-1 bg-inherit">
-                <button 
+                <button
                   (click)="handleRenameFolder($event, uFolder)"
                   class="p-1 hover:bg-gray-200 rounded text-gray-500 hover:text-blue-600 transition-colors"
-                  title="Rename Folder">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
-                    <path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z" />
-                    <path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z" />
+                  title="Rename Folder"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    class="size-4"
+                  >
+                    <path
+                      d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z"
+                    />
+                    <path
+                      d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z"
+                    />
                   </svg>
                 </button>
 
-                <button 
+                <button
                   (click)="handleDeleteFolder($event, uFolder)"
                   class="p-1 hover:bg-gray-200 rounded text-gray-500 hover:text-red-600 transition-colors"
-                  title="Delete Folder">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
-                    <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
+                  title="Delete Folder"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    class="size-4"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z"
+                      clip-rule="evenodd"
+                    />
                   </svg>
                 </button>
               </div>
-
             </div>
           } @empty {
             <div class="px-3 py-2">
@@ -237,21 +262,16 @@
     <main class="bg-white grow rounded-2xl overflow-hidden shadow-lg relative">
       @if (selectedFolder() == 'Inbox') {
         <app-inbox [userFolders]="userFolders"></app-inbox>
-      }
-      @else if (selectedFolder() == 'Sent') {
+      } @else if (selectedFolder() == 'Sent') {
         <app-sent [userFolders]="userFolders"></app-sent>
-      }
 
-      @else if (selectedFolder() == 'Trash') {
+      } @else if (selectedFolder() == 'Trash') {
         <app-trashfolder [searchBy]="searchBy()"></app-trashfolder>
       } @else if (selectedFolder() == 'Drafts') {
-
         <app-drafts />
-      }
-      @else {
+      } @else {
         <app-custom-folder [folderName]="selectedFolder().toString()"></app-custom-folder>
       }
-
     </main>
   </div>
 
@@ -265,4 +285,3 @@
 </div>
 
 <app-compose [isComposeOpen]="isComposeOpen" (closeCompose)="isComposeOpen = false"></app-compose>
-
