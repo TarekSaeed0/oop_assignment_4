@@ -9,8 +9,10 @@ import { UserFolder, UserFolderService } from '../../services/UserFolderService'
 import { CustomFolderComponent } from '../custom-folder/custom-folder';
 import { Compose } from '../compose/compose';
 import { TrashfolderComponent } from '../trashfolder/trashfolder';
+import {Drafts} from '../drafts/drafts';
+
 @Component({
-  imports: [RouterLink, Inbox, Sent, Contact, CreateFolderDialogComponent, CustomFolderComponent, Compose,TrashfolderComponent],
+  imports: [RouterLink, Inbox, Sent, Contact, CreateFolderDialogComponent, CustomFolderComponent, Compose, Drafts,TrashfolderComponent],
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
@@ -144,6 +146,10 @@ private userFolderService = inject(UserFolderService);
   isComposeOpen = false;
   openCompose() {
     this.isComposeOpen = true;
+  }
+  closeCompose() {
+    this.isComposeOpen = false;
+    return true;
   }
 
 }

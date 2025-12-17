@@ -55,4 +55,10 @@
     {{mail()?.data?.body}}
   </div>
 
+  <div class="flex flex-wrap gap-2 p-2">
+    @for (attachment of mail()?.data?.attachments; track attachment.name) {
+      <app-attachment [attachment]="attachment" [preview]="true" />
+    }
+  </div>
+
 </div>
