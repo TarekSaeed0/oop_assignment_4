@@ -21,10 +21,10 @@ public class MailComparatorFactory {
 				return Comparator.comparing((a) ->a.getData().getSubject());
 			}
 			case "priority" -> {
-				return Comparator.comparing((a) ->a.getData().getPriority());
+				return (a, b) -> -a.getData().getPriority().compareTo(b.getData().getPriority());
 			}
 			case "date"-> {
-				return Comparator.comparing((a) -> -a.getData().getSentAt().getSecond());
+				return (a, b) -> -a.getData().getSentAt().compareTo(b.getData().getSentAt());
 			}
 			default -> {
 				return Comparator.comparing(a -> a.getData().getSentAt());

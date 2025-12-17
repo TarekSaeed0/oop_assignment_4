@@ -35,7 +35,7 @@ public class MailController {
 	}
 	@PostMapping("sent")
 	List<SentMailDTO> getSent(@RequestBody InboxRequest inboxRequest) {
-		return mailService.getSentV2(inboxRequest);
+		return mailService.getSent(inboxRequest);
 	}
 	/*@PostMapping("trash")
 	List<InboxMailDTO> getTrash(@RequestBody InboxRequest inboxRequest) {
