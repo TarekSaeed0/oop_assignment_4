@@ -1,59 +1,153 @@
-<div class="container">
-  <!-- Top Create Button -->
-  <button class="create-btn" (click)="toggleForm()">
-    {{ showForm() ? 'Close Form' : 'Create Contact' }}
-  </button>
+<div class="max-w-6xl mx-auto p-6 space-y-6"
+style="background: #5252521c;
+    border-radius: 20px;">
 
-  <!-- Create / Edit Form -->
-  @if (showForm()) {
-  <div class="form">
-    <h3>{{ isEdit() ? 'Edit Contact' : 'Create Contact' }}</h3>
+  <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border">
 
-    <label>Name:</label>
-    <input type="text" [(ngModel)]="name" />
-
-    <label>Add Email:</label>
-    <input type="text" [(ngModel)]="emailInput" />
-    <button (click)="addEmail()">Add Email</button>
-
-    <div>
-      @for (e of emailList(); track $index) {
-      <span>
-        {{ e }}
-        <button (click)="removeEmail($index)">x</button>
-      </span>
-      }
+    <!-- Search -->
+    <div class="relative w-full md:w-1/3">
+      <input
+        type="text"
+        [value]="searchTerm()"
+        (input)="onSearchChange($event)"
+        placeholder="Search contacts"
+        class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <span class="absolute left-3 top-2.5 text-gray-400">🔍</span>
     </div>
 
-    <button (click)="saveContact()">
-      {{ isEdit() ? 'Update Contact' : 'Save Contact' }}
-    </button>
-    <button (click)="resetForm()">Reset</button>
+    <!-- Actions -->
+    <div class="flex gap-2">
+      <button
+        (click)="toggleSort()"
+        class="px-4 py-2 rounded-lg border text-sm font-medium hover:bg-gray-100"
+      >
+        {{ isSorted() ? 'Original Order' : 'Sort A–Z' }}
+      </button>
+
+      <button
+        (click)="toggleForm()"
+        class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700"
+      >
+        {{ showForm() ? 'Close' : 'New Contact' }}
+      </button>
+    </div>
   </div>
 
-  <hr />
-  }
+  @if (showForm()) {
+    <div class="bg-white border rounded-xl shadow-sm p-6 space-y-4">
 
-  <h3>All Contacts</h3>
+      <h2 class="text-lg font-semibold text-gray-800">
+        {{ isEdit() ? 'Edit Contact' : 'Create Contact' }}
+      </h2>
 
-  <!-- Display All Contacts -->
-  @for (c of contacts(); track c.contactId) {
-  <div class="contact-card flex justify-between">
-    <div class="contact-header">
-      <b>{{ c.name }}</b>
+      <!-- Name -->
+      <div>
+        <label class="block text-sm font-medium text-gray-600 mb-1">Name</label>
+        <input
+          type="text"
+          [value]="name()"
+          (input)="name.set($any($event.target).value)"
+          class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
 
-      <div class="emails">
-        @for (e of c.contactEmails; track $index) {
-        <span class="email-tag">{{ e }}</span>
+      <!-- Email Input -->
+      <div>
+        <label class="block text-sm font-medium text-gray-600 mb-1">Email</label>
+        <div class="flex gap-2">
+          <input
+            type="text"
+            [value]="emailInput()"
+            (input)="emailInput.set($any($event.target).value)"
+            class="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            (click)="addEmail()"
+            class="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200"
+          >
+            Add
+          </button>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        @for (e of emailList(); track $index) {
+          <span class="flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">
+            {{ e }}
+            <button
+              (click)="removeEmail($index)"
+              class="text-blue-500 hover:text-red-500"
+            >
+              ✕
+            </button>
+          </span>
         }
       </div>
+
+      <!-- Form Actions -->
+      <div class="flex justify-end gap-3 pt-4">
+        <button
+          (click)="resetForm()"
+          class="px-4 py-2 rounded-lg border hover:bg-gray-100"
+        >
+          Reset
+        </button>
+        <button
+          (click)="saveContact()"
+          class="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+        >
+          {{ isEdit() ? 'Update' : 'Save' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Contacts List -->
+  <div class="overflow-hidden bg-white border rounded-xl shadow-sm">
+
+    <div class="p-4 border-b">
+      <h3 class="font-semibold text-gray-800">Contacts</h3>
     </div>
 
-    <div class="actions">
-      <button (click)="edit(c)">Edit</button>
-      <!-- FIX: use contactId instead of id -->
-      <button (click)="delete(c)">Delete</button>
+    <div class="divide-y">
+      @for (c of filteredContacts(); track c.contactId) {
+        <div class="flex justify-between items-center p-4 hover:bg-gray-50 ">
+
+          <!-- Contact Info -->
+          <div>
+            <p class="font-medium text-gray-900">{{ c.name }}</p>
+            <div class="flex flex-wrap gap-2 mt-1">
+              @for (e of c.contactEmails; track $index) {
+                <span class="text-xs bg-gray-100 px-2 py-1 rounded-full">
+                  {{ e }}
+                </span>
+              }
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-2">
+            <button
+              (click)="edit(c)"
+              class="px-3 py-1.5 text-sm rounded-lg border hover:bg-gray-100"
+            >
+              Edit
+            </button>
+            <button
+              (click)="delete(c)"
+              class="px-3 py-1.5 text-sm rounded-lg text-red-600 hover:bg-red-50"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      } @empty {
+        <div class="p-6 text-center text-gray-500">
+          No contacts found
+        </div>
+      }
     </div>
   </div>
-  }
+
 </div>

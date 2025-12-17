@@ -191,6 +191,13 @@ export class HomeComponent {
   toggleContactMenu() {
     this.isContactMenuOpen = !this.isContactMenuOpen;
   }
+  @HostListener('document:click', ['$event'])
+  hideContactMenu(event: Event) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('#contact-menu, #contact-menu-button')) {
+      this.isContactMenuOpen = false;
+    }
+  }
 
   // ! -------------------- Compose ------------------
   isComposeOpen = false;

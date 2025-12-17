@@ -1,4 +1,4 @@
-<div class="flex flex-col h-screen bg-gray-100 text-gray-800">
+<div class="overflow-hidden flex flex-col h-screen bg-gray-100 text-gray-800">
   <header
     class="h-16 bg-white flex items-center justify-between shadow-lg pl-6 pr-4 py-1 relative z-20"
   >
@@ -63,9 +63,7 @@
         </button>
       </div>
 
-      @if (isContactMenuOpen) {
-        <app-contact></app-contact>
-      }
+
 
       <div
         id="user-menu"
@@ -282,6 +280,14 @@
       (folderCreated)="refreshUserFolders()"
     ></app-create-folder-dialog>
   }
+  @if (isContactMenuOpen) {
+        <div class="absolute to-50% min-h-screen flex items-center justify-center z-50 overflow-hidden"
+        style="left: 50%; transform: translateX(-50%);">
+    <!-- Contact Component -->
+    <app-contact></app-contact>
+  </div>
+}
+
 </div>
 
 <app-compose [isComposeOpen]="isComposeOpen" (closeCompose)="isComposeOpen = false"></app-compose>

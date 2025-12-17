@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ContactService } from '../../services/contact-service';
 import { AuthenticationService } from '../../services/authentication.service';
@@ -14,7 +14,29 @@ export class Contact implements OnInit {
   private contactService = inject(ContactService);
   private authService = inject(AuthenticationService);
 
+  searchTerm = signal('');
+  isSorted = signal(false);
+
   contacts = signal<any[]>([]);
+filteredContacts = computed(() => {
+    let list = [...this.contacts()];
+    const search = this.searchTerm().toLowerCase().trim();
+
+    // 1. Filter logic
+    if (search) {
+      list = list.filter(c =>
+        c.name.toLowerCase().includes(search) ||
+        c.contactEmails.some((e: string) => e.toLowerCase().includes(search))
+      );
+    }
+
+    // 2. Sort logic
+    if (this.isSorted()) {
+      list.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    return list;
+  });
   showForm = signal(false);
 
   name = signal('');
@@ -104,5 +126,14 @@ export class Contact implements OnInit {
     this.emailList.set([]);
     this.isEdit.set(false);
     this.editContactId.set(null);
+  }
+
+  toggleSort() {
+    this.isSorted.update((v) => !v);
+  }
+
+  onSearchChange(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    this.searchTerm.set(value);
   }
 }
