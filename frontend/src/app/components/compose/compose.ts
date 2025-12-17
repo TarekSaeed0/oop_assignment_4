@@ -23,8 +23,8 @@ export class Compose {
   @Output() closeCompose = new EventEmitter<void>();
   @Input() isComposeOpen: boolean = false;
 
-fromUserId: WritableSignal<number> = signal(0);  toEmails = signal<string[]>([]);
-  toEmails = signal<string[]>([]);
+fromUserId: WritableSignal<number> = signal(0); 
+ toEmails = signal<string[]>([]);
   toEmailInput = signal('');
   subject = signal('');
   body = signal('');
