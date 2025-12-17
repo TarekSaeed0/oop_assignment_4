@@ -84,6 +84,48 @@ private userFolderService = inject(UserFolderService);
     }
   }
 
+  handleDeleteFolder(event: Event, folder: UserFolder) {
+    // Prevent the click from selecting the folder immediately
+    event.stopPropagation();
+
+    if(!folder.name) return;
+
+    if (confirm(`Are you sure you want to delete the folder "${folder.name}"? Mails inside will be kept but detached from the folder.`)) {
+      this.userFolderService.deleteFolder(this.currentUserId, folder.name).subscribe({
+        next: () => {
+          // If we are currently looking at this folder, switch to Inbox
+          if (this.selectedFolder() === folder.name) {
+            this.selectedFolder.set('Inbox');
+          }
+          this.refreshUserFolders();
+        },
+        error: (err) => alert("Error deleting folder")
+      });
+    }
+  }
+
+  handleRenameFolder(event: Event, folder: UserFolder) {
+    event.stopPropagation();
+    
+    if(!folder.name) return;
+
+    const newName = prompt("Enter new folder name:", folder.name);
+    
+    // Check if name is valid and actually changed
+    if (newName && newName.trim() !== "" && newName !== folder.name) {
+      this.userFolderService.renameFolder(this.currentUserId, folder.name, newName).subscribe({
+        next: () => {
+          // If we are currently inside this folder, update the view name
+          if (this.selectedFolder() === folder.name) {
+            this.selectedFolder.set(newName);
+          }
+          this.refreshUserFolders();
+        },
+        error: (err) => alert("Error renaming folder. Name might already exist.")
+      });
+    }
+  }
+
   ///done UserFolderService methods
   toggleUserMenu() {
     this.isUserMenuOpen = !this.isUserMenuOpen;

@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { CommonModule, DatePipe, SlicePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms'; // Ensure this is imported
 import { MailService } from '../../services/mail-service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { MailInbox } from "../mail-inbox/mail-inbox";
@@ -9,7 +10,7 @@ import { MailInSent } from "../mail-in-sent/mail-in-sent";
 @Component({
   selector: 'app-custom-folder',
   standalone: true,
-  imports: [CommonModule, MailInbox, DatePipe, SlicePipe, MailInSent],
+  imports: [CommonModule, MailInbox, DatePipe, SlicePipe, MailInSent, FormsModule],
   templateUrl: './custom-folder.html',
   styleUrl: './custom-folder.css'
 })
@@ -21,27 +22,63 @@ export class CustomFolderComponent {
   private mailService = inject(MailService);
   private authService = inject(AuthenticationService);
   private userFolderService = inject(UserFolderService);
+
   // State
-  allMails = signal<any[]>([]); // Stores all fetched mails
-  displayedMails = signal<any[]>([]); // Stores current page
+  allMails = signal<any[]>([]); 
+  
+  // --- Filter State ---
+  searchQuery = signal<string>('');
+  filterType = signal<'General' | 'Sender' | 'Subject' | 'Body' | 'Priority'>('General');
+  
+  // Computed: Filters based on Query AND selected Filter Type
+  filteredMails = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    const type = this.filterType();
+    const mails = this.allMails();
+
+    if (!query) return mails;
+
+    return mails.filter(mail => {
+      const sender = (mail.data.senderName || '') + ' ' + (mail.data.senderEmail || '');
+      const subject = mail.data.subject || '';
+      const body = mail.data.body || '';
+      const priority = mail.data.priority || '';
+
+      if (type === 'General') {
+        // Search EVERYWHERE
+        return sender.toLowerCase().includes(query) ||
+               subject.toLowerCase().includes(query) ||
+               body.toLowerCase().includes(query) ||
+               priority.toLowerCase().includes(query);
+      } 
+      else if (type === 'Sender') {
+        return sender.toLowerCase().includes(query);
+      }
+      else if (type === 'Subject') {
+        return subject.toLowerCase().includes(query);
+      }
+      else if (type === 'Body') {
+        return body.toLowerCase().includes(query);
+      }
+      else if (type === 'Priority') {
+        return priority.toLowerCase().includes(query);
+      }
+      return false;
+    });
+  });
+
+  // State for View
+  displayedMails = signal<any[]>([]); 
   currentMailId = signal<null | number>(null);
   selectedMail = signal<number[]>([]);
 
   isCurrentMailSentByMe = computed(() => {
     const selectedId = this.currentMailId();
-    console.log("Selected Mail ID:", selectedId);
     const currentUserEmail = this.authService.user()?.email;
-
     if (!selectedId || !currentUserEmail) return false;
-
     const mail = this.displayedMails().find(m => m.id === selectedId);
-    console.log("Mail", mail);
-
-    console.log("Mail sende", mail?.data?.senderEmail);
-    console.log("Current user :", currentUserEmail);
     return mail?.data?.senderEmail === currentUserEmail;
   });
-
 
   // Pagination
   page = signal<number>(1);
@@ -50,10 +87,17 @@ export class CustomFolderComponent {
   constructor() {
     // Reload mails when folder name changes
     effect(() => {
-      this.page.set(1); // Reset to page 1
-      this.selectedMail.set([]); // Clear selection
-      this.currentMailId.set(null); // Close open email
+      this.page.set(1); 
+      this.selectedMail.set([]); 
+      this.currentMailId.set(null); 
+      this.searchQuery.set(''); 
+      this.filterType.set('General'); // Reset filter type
       this.handleRefresh();
+    });
+
+    // Update displayed mails whenever the filtered list or page changes
+    effect(() => {
+      this.updateDisplayedMails();
     });
   }
 
@@ -65,31 +109,41 @@ export class CustomFolderComponent {
       this.mailService.getMailsByFolder(userId, name).subscribe({
         next: (data) => {
           this.allMails.set(data);
-          this.updateDisplayedMails();
         },
         error: (err) => console.error(err)
       });
     }
   }
 
-  // --- Client Side Pagination Logic ---
   updateDisplayedMails() {
+    const source = this.filteredMails(); 
     const startIndex = (this.page() - 1) * this.size();
     const endIndex = startIndex + this.size();
-    this.displayedMails.set(this.allMails().slice(startIndex, endIndex));
+    this.displayedMails.set(source.slice(startIndex, endIndex));
+  }
+
+  // Handle Search Input Change
+  handleSearchChange(newValue: string) {
+    this.searchQuery.set(newValue);
+    this.page.set(1); 
+  }
+
+  // Handle Dropdown Change
+  handleFilterTypeChange(event: Event) {
+    const selectElement = event.target as HTMLSelectElement;
+    this.filterType.set(selectElement.value as any);
+    this.page.set(1);
   }
 
   handleNextPage = () => {
     if (this.hasNextPage()) {
       this.page.update((p) => p + 1);
-      this.updateDisplayedMails();
     }
   }
 
   handlePrevPage = () => {
     if (this.hasPrevPage()) {
       this.page.update((p) => p - 1);
-      this.updateDisplayedMails();
     }
   }
 
@@ -98,10 +152,9 @@ export class CustomFolderComponent {
   }
 
   hasNextPage() {
-    return (this.page() * this.size()) < this.allMails().length;
+    return (this.page() * this.size()) < this.filteredMails().length;
   }
 
-  // --- Selection Logic ---
   handleSelectMail = (id: number) => {
     this.selectedMail.update((l) => {
       if (l.includes(id)) return l.filter((d) => d != id);
@@ -121,19 +174,17 @@ export class CustomFolderComponent {
   }
 
   isAllSelected() {
-    return (this.selectedMail().length === this.displayedMails().length) && (this.displayedMails().length !== 0);
+    return (this.displayedMails().length > 0) && 
+           this.displayedMails().every(m => this.selectedMail().includes(m.id));
   }
 
-  // --- Actions ---
   handleClickEmail(id: number) {
     this.currentMailId.set(id);
   }
 
   handleDelete(id: number) {
     this.mailService.deleteMail(id).subscribe({
-      next: () => {
-        this.handleRefresh()
-      }
+      next: () => this.handleRefresh()
     });
   }
 
@@ -145,11 +196,6 @@ export class CustomFolderComponent {
         this.selectedMail.set([]);
       }
     });
-  }
-
-  // Placeholder for move logic
-  handleBulkMove() {
-    console.log("Move logic implementation needed");
   }
 
   handleRemoveFromFolder() {
@@ -165,5 +211,4 @@ export class CustomFolderComponent {
       });
     }
   }
-
 }

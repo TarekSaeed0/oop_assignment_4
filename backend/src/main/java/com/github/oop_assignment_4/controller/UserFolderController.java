@@ -41,4 +41,14 @@ public class UserFolderController {
         return userFolderService.getUserFolders(userId);
     }
 
+    @PostMapping("/deleteFolder")
+    public void deleteFolder(@RequestParam Long id,@RequestBody FolderRequest folderRequest) {
+        userFolderService.deleteFolder(id, folderRequest.name());
+    }
+
+    @PostMapping("/renameFolder")
+    public void renameFolder(@RequestParam Long id,String newName,@RequestBody FolderRequest folderRequest) {
+        userFolderService.renameFolder(id,folderRequest.name(),newName);
+    }
+
 }
