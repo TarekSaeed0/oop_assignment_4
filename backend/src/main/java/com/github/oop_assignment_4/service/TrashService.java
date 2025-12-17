@@ -158,8 +158,6 @@ public class TrashService {
 
     @Transactional
     public List<DeletedMailDTO> getTrash(InboxRequest inboxRequest) {
-//        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
-//        mailRepository.deleteByDeletedAtBefore(thirtyDaysAgo);
 
         List<Mail> allMail = mailRepository.findByUserId(inboxRequest.getUserId());
 

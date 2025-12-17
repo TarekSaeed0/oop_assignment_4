@@ -91,4 +91,37 @@ export class UserFolderService {
 
     return this.http.post(`${this.baseUrl}/deleteMailFromFolder`, body, { responseType: 'text' });
   }
+
+public deleteFolder(userId: number, folderName: string): Observable<string> {
+    const params = new HttpParams().set('id', userId);
+    
+    // The backend expects a body with the name
+    const body: FolderRequest = { 
+      name: folderName, 
+      id: userId 
+    };
+
+    return this.http.post(`${this.baseUrl}/deleteFolder`, body, { 
+        params, 
+        responseType: 'text' 
+    });
+  }
+
+  public renameFolder(userId: number, oldName: string, newName: string): Observable<string> {
+    const params = new HttpParams()
+        .set('id', userId)
+        .set('newName', newName);
+
+    // The backend uses the body to identify the OLD folder
+    const body: FolderRequest = { 
+      name: oldName, 
+      id: userId 
+    };
+
+    return this.http.post(`${this.baseUrl}/renameFolder`, body, { 
+        params, 
+        responseType: 'text' 
+    });
+  }
+
 }
