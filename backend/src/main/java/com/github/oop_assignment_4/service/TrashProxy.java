@@ -17,7 +17,7 @@ MailRepository mailRepository;
 
     public List<DeletedMailDTO> getTrash(InboxRequest inboxRequest) {
 
-        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusMinutes(1);//delete before 3 mins
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusMinutes(3);//delete before 7 mins
         mailRepository.deleteByDeletedAtBefore(thirtyDaysAgo);
 
         return super.getTrash(inboxRequest);

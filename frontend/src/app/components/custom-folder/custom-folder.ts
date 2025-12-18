@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { CommonModule, DatePipe, SlicePipe } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // Ensure this is imported
+import { FormsModule } from '@angular/forms'; 
 import { MailService } from '../../services/mail-service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { MailInbox } from "../mail-inbox/mail-inbox";
@@ -23,174 +23,167 @@ export class CustomFolderComponent {
   private authService = inject(AuthenticationService);
   private userFolderService = inject(UserFolderService);
 
-  // State
+  // --- State Signals ---
   allMails = signal<any[]>([]); 
-  
-  // --- Filter State ---
+  currentMailId = signal<null | number>(null);
+  selectedMail = signal<number[]>([]);
+
+  // Search & Filter State
   searchQuery = signal<string>('');
   filterType = signal<'General' | 'Sender' | 'Subject' | 'Body' | 'Priority'>('General');
   
-  // Computed: Filters based on Query AND selected Filter Type
-  filteredMails = computed(() => {
+  // Sort State
+  sortKey = signal<'date' | 'sender' | 'subject'>('date');
+  sortOrder = signal<'asc' | 'desc'>('desc');
+
+  // Pagination State
+  page = signal<number>(1);
+  size = signal<number>(10);
+
+  // --- Reactive Pipeline (Filter -> Sort) ---
+  filteredAndSortedMails = computed(() => {
+    let list = [...this.allMails()];
     const query = this.searchQuery().toLowerCase().trim();
     const type = this.filterType();
-    const mails = this.allMails();
 
-    if (!query) return mails;
+    // 1. Filtering Logic
+    if (query) {
+      list = list.filter(mail => {
+        const sender = `${mail.data.senderName || ''} ${mail.data.senderEmail || ''}`.toLowerCase();
+        const subject = (mail.data.subject || '').toLowerCase();
+        const body = (mail.data.body || '').toLowerCase();
+        const priority = (mail.data.priority || '').toLowerCase();
 
-    return mails.filter(mail => {
-      const sender = (mail.data.senderName || '') + ' ' + (mail.data.senderEmail || '');
-      const subject = mail.data.subject || '';
-      const body = mail.data.body || '';
-      const priority = mail.data.priority || '';
+        switch (type) {
+          case 'Sender': return sender.includes(query);
+          case 'Subject': return subject.includes(query);
+          case 'Body': return body.includes(query);
+          case 'Priority': return priority.includes(query);
+          default: 
+            return sender.includes(query) || subject.includes(query) || 
+                   body.includes(query) || priority.includes(query);
+        }
+      });
+    }
 
-      if (type === 'General') {
-        // Search EVERYWHERE
-        return sender.toLowerCase().includes(query) ||
-               subject.toLowerCase().includes(query) ||
-               body.toLowerCase().includes(query) ||
-               priority.toLowerCase().includes(query);
-      } 
-      else if (type === 'Sender') {
-        return sender.toLowerCase().includes(query);
+    // 2. Sorting Logic
+    const key = this.sortKey();
+    const order = this.sortOrder();
+
+    list.sort((a, b) => {
+      let valA: any, valB: any;
+      if (key === 'date') {
+        valA = new Date(a.data.sentAt).getTime();
+        valB = new Date(b.data.sentAt).getTime();
+      } else if (key === 'sender') {
+        valA = (a.data.senderName || '').toLowerCase();
+        valB = (b.data.senderName || '').toLowerCase();
+      } else {
+        valA = (a.data.subject || '').toLowerCase();
+        valB = (b.data.subject || '').toLowerCase();
       }
-      else if (type === 'Subject') {
-        return subject.toLowerCase().includes(query);
-      }
-      else if (type === 'Body') {
-        return body.toLowerCase().includes(query);
-      }
-      else if (type === 'Priority') {
-        return priority.toLowerCase().includes(query);
-      }
-      return false;
+
+      if (valA < valB) return order === 'asc' ? -1 : 1;
+      if (valA > valB) return order === 'asc' ? 1 : -1;
+      return 0;
     });
+
+    return list;
   });
 
-  // State for View
-  displayedMails = signal<any[]>([]); 
-  currentMailId = signal<null | number>(null);
-  selectedMail = signal<number[]>([]);
+  // 3. Reactive Pagination Slice
+  displayedMails = computed(() => {
+    const start = (this.page() - 1) * this.size();
+    return this.filteredAndSortedMails().slice(start, start + this.size());
+  });
+
+  // --- Computed Helpers ---
+  totalPages = computed(() => Math.ceil(this.filteredAndSortedMails().length / this.size()) || 1);
+  hasPrevPage = computed(() => this.page() > 1);
+  hasNextPage = computed(() => (this.page() * this.size()) < this.filteredAndSortedMails().length);
 
   isCurrentMailSentByMe = computed(() => {
     const selectedId = this.currentMailId();
     const currentUserEmail = this.authService.user()?.email;
     if (!selectedId || !currentUserEmail) return false;
-    const mail = this.displayedMails().find(m => m.id === selectedId);
+    const mail = this.allMails().find(m => m.id === selectedId);
     return mail?.data?.senderEmail === currentUserEmail;
   });
 
-  // Pagination
-  page = signal<number>(1);
-  size = signal<number>(10);
-
   constructor() {
-    // Reload mails when folder name changes
+    // Reset view and reload when folder changes
     effect(() => {
-      this.page.set(1); 
-      this.selectedMail.set([]); 
-      this.currentMailId.set(null); 
-      this.searchQuery.set(''); 
-      this.filterType.set('General'); // Reset filter type
+      this.folderName(); 
+      this.resetView();
       this.handleRefresh();
-    });
+    }, { allowSignalWrites: true });
+  }
 
-    // Update displayed mails whenever the filtered list or page changes
-    effect(() => {
-      this.updateDisplayedMails();
-    });
+  // --- Handlers ---
+  resetView() {
+    this.page.set(1);
+    this.selectedMail.set([]);
+    this.currentMailId.set(null);
+    this.searchQuery.set('');
+    this.sortKey.set('date');
+    this.sortOrder.set('desc');
   }
 
   handleRefresh = () => {
     const userId = this.authService.user()?.id;
     const name = this.folderName();
-
     if (userId && name) {
       this.mailService.getMailsByFolder(userId, name).subscribe({
-        next: (data) => {
-          this.allMails.set(data);
-        },
+        next: (data) => this.allMails.set(data),
         error: (err) => console.error(err)
       });
     }
   }
 
-  updateDisplayedMails() {
-    const source = this.filteredMails(); 
-    const startIndex = (this.page() - 1) * this.size();
-    const endIndex = startIndex + this.size();
-    this.displayedMails.set(source.slice(startIndex, endIndex));
-  }
-
-  // Handle Search Input Change
   handleSearchChange(newValue: string) {
     this.searchQuery.set(newValue);
     this.page.set(1); 
   }
 
-  // Handle Dropdown Change
   handleFilterTypeChange(event: Event) {
-    const selectElement = event.target as HTMLSelectElement;
-    this.filterType.set(selectElement.value as any);
+    this.filterType.set((event.target as HTMLSelectElement).value as any);
     this.page.set(1);
   }
 
-  handleNextPage = () => {
-    if (this.hasNextPage()) {
-      this.page.update((p) => p + 1);
+  toggleSort(key: 'date' | 'sender' | 'subject') {
+    if (this.sortKey() === key) {
+      this.sortOrder.update(o => o === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortKey.set(key);
+      this.sortOrder.set(key === 'date' ? 'desc' : 'asc');
     }
   }
 
-  handlePrevPage = () => {
-    if (this.hasPrevPage()) {
-      this.page.update((p) => p - 1);
-    }
-  }
-
-  hasPrevPage() {
-    return this.page() > 1;
-  }
-
-  hasNextPage() {
-    return (this.page() * this.size()) < this.filteredMails().length;
-  }
+  handleNextPage = () => { if (this.hasNextPage()) this.page.update(p => p + 1); }
+  handlePrevPage = () => { if (this.hasPrevPage()) this.page.update(p => p - 1); }
 
   handleSelectMail = (id: number) => {
-    this.selectedMail.update((l) => {
-      if (l.includes(id)) return l.filter((d) => d != id);
-      else {
-        l.push(id);
-        return l;
-      }
-    });
+    this.selectedMail.update(l => l.includes(id) ? l.filter(d => d !== id) : [...l, id]);
   }
 
   handleSelectAll = () => {
-    if (this.isAllSelected()) {
-      this.selectedMail.set([]);
-    } else {
-      this.selectedMail.set(this.displayedMails().map((e) => e.id));
-    }
+    if (this.isAllSelected()) this.selectedMail.set([]);
+    else this.selectedMail.set(this.displayedMails().map(e => e.id));
   }
 
   isAllSelected() {
-    return (this.displayedMails().length > 0) && 
+    return this.displayedMails().length > 0 && 
            this.displayedMails().every(m => this.selectedMail().includes(m.id));
   }
 
-  handleClickEmail(id: number) {
-    this.currentMailId.set(id);
-  }
+  handleClickEmail(id: number) { this.currentMailId.set(id); }
 
   handleDelete(id: number) {
-    this.mailService.deleteMail(id).subscribe({
-      next: () => this.handleRefresh()
-    });
+    this.mailService.deleteMail(id).subscribe({ next: () => this.handleRefresh() });
   }
 
   handleBulkDelete() {
-    const mailList = this.selectedMail();
-    this.mailService.bulkDelete(mailList).subscribe({
+    this.mailService.bulkDelete(this.selectedMail()).subscribe({
       next: () => {
         this.handleRefresh();
         this.selectedMail.set([]);
@@ -200,10 +193,8 @@ export class CustomFolderComponent {
 
   handleRemoveFromFolder() {
     const userId = this.authService.user()?.id;
-    const folderName = this.folderName();
-    const mailIds = this.selectedMail();
-    if (userId && folderName && mailIds.length > 0) {
-      this.userFolderService.deleteFromFolder(userId, folderName, mailIds).subscribe({
+    if (userId && this.selectedMail().length > 0) {
+      this.userFolderService.deleteFromFolder(userId, this.folderName(), this.selectedMail()).subscribe({
         next: () => {
           this.handleRefresh();
           this.selectedMail.set([]);

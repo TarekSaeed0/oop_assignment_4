@@ -3,7 +3,7 @@
     <app-mail-in-sent [currentMailId]="currentMailId"></app-mail-in-sent>
   }
   @else {
-     <app-mail-inbox [currentMailId]="currentMailId"></app-mail-inbox>
+    <app-mail-inbox [currentMailId]="currentMailId"></app-mail-inbox>
   }
 } 
 @else {
@@ -11,21 +11,36 @@
     <div class="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3">
       
       <div class="flex items-center justify-between mb-3 gap-4">
-         <h2 class="text-lg font-bold text-gray-700 shrink-0">{{ folderName() }}</h2>
+          <h2 class="text-lg font-bold text-gray-700 shrink-0">{{ folderName() }}</h2>
 
-         <div class="flex items-center gap-2 grow max-w-md">
-            
+          <div class="flex items-center gap-2 grow max-w-2xl">
             <select 
-                class="px-3 py-1.5 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer hover:bg-gray-100 transition-colors"
+                class="px-3 py-1.5 text-sm bg-gray-50 border border-gray-300 rounded-lg outline-none cursor-pointer"
                 [value]="filterType()"
                 (change)="handleFilterTypeChange($event)"
             >
-                <option value="General">General</option>
+                <option value="General">Filter: General</option>
                 <option value="Sender">Sender</option>
                 <option value="Subject">Subject</option>
                 <option value="Body">Body</option>
                 <option value="Priority">Priority</option>
             </select>
+
+            <div class="flex items-center bg-gray-50 border border-gray-300 rounded-lg px-2">
+                <select 
+                    class="bg-transparent py-1.5 text-sm outline-none cursor-pointer border-none"
+                    [value]="sortKey()"
+                    (change)="toggleSort($any($event.target).value)"
+                >
+                    <option value="date">Sort: Date</option>
+                    <option value="sender">Sort: Sender</option>
+                    <option value="subject">Sort: Subject</option>
+                </select>
+                <button (click)="sortOrder.set(sortOrder() === 'asc' ? 'desc' : 'asc')" 
+                        class="ml-1 text-blue-600 font-bold">
+                    {{ sortOrder() === 'asc' ? '↑' : '↓' }}
+                </button>
+            </div>
 
             <div class="relative grow">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
@@ -35,13 +50,13 @@
                 </span>
                 <input 
                   type="text" 
-                  class="w-full py-1.5 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                  [placeholder]="'Filter by ' + filterType() + '...'"
+                  class="w-full py-1.5 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 outline-none"
+                  [placeholder]="'Search in ' + folderName() + '...'"
                   [ngModel]="searchQuery()"
                   (ngModelChange)="handleSearchChange($event)"
                 >
             </div>
-         </div>
+          </div>
       </div>
 
       <div class="flex items-center justify-between">
@@ -53,54 +68,29 @@
             (change)="handleSelectAll()"
           >
           
-          <button
-            class="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            (click)="handleRefresh()"
-            title="Refresh"
-          >
+          <button (click)="handleRefresh()" class="p-2 hover:bg-gray-100 rounded-full transition-colors" title="Refresh">
             <span class="text-gray-600">🔄</span>
           </button>
 
           @if (selectedMail().length > 0) {
-            <div class="flex items-center gap-2 pl-2 border-l border-gray-300">
-              <button
-                class="p-2 hover:bg-red-50 rounded-full transition-colors group"
-                (click)="handleBulkDelete()"
-                title="Delete"
-              >
-                <span class="group-hover:scale-110 transition-transform inline-block">🗑️</span>
+            <div class="flex items-center gap-2 pl-2 border-l border-gray-300 animate-fade-in">
+              <button (click)="handleBulkDelete()" class="p-2 hover:bg-red-50 rounded-full text-red-600" title="Delete">
+                🗑️
               </button>
-              <button
-                class="p-2 hover:bg-blue-50 rounded-full transition-colors group"
-                (click)="handleRemoveFromFolder()"
-                title="Remove from folder"
-              >
-                <span class="group-hover:scale-110 transition-transform inline-block">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                  </svg>
-                </span>
+              <button (click)="handleRemoveFromFolder()" class="p-2 hover:bg-blue-50 rounded-full text-blue-600" title="Remove from folder">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
               </button>
+              <span class="text-sm text-gray-500 ml-1">{{selectedMail().length}} selected</span>
             </div>
           }
         </div>
 
         <div class="flex items-center gap-2 text-sm text-gray-600">
-          <span>Page {{page()}}</span>
-          <button
-            class="p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            (click)="handlePrevPage()"
-            [disabled]="!hasPrevPage()"
-          >
-            ◀
-          </button>
-          <button
-            class="p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            (click)="handleNextPage()"
-            [disabled]="!hasNextPage()"
-          >
-            ▶
-          </button>
+          <span>Page {{page()}} of {{totalPages()}}</span>
+          <button class="p-2 hover:bg-gray-100 rounded-full disabled:opacity-30" (click)="handlePrevPage()" [disabled]="!hasPrevPage()">◀</button>
+          <button class="p-2 hover:bg-gray-100 rounded-full disabled:opacity-30" (click)="handleNextPage()" [disabled]="!hasNextPage()">▶</button>
         </div>
       </div>
     </div>
@@ -109,49 +99,39 @@
       @for (mail of displayedMails(); track mail.id) {
         <div
           class="group flex items-center px-4 py-2 border-b border-gray-100 hover:shadow-md hover:z-10 relative cursor-pointer transition-all duration-150"
-          [class.bg-white]="!selectedMail().includes(mail.id)"
           [class.bg-blue-50]="selectedMail().includes(mail.id)"
+          (click)="handleClickEmail(mail.id)"
         >
-          <div class="flex items-center gap-3 shrink-0">
+          <div class="flex items-center gap-3 shrink-0" (click)="$event.stopPropagation()">
             <input
               type="checkbox"
               class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
               [checked]="selectedMail().includes(mail.id)"
               (change)="handleSelectMail(mail.id)"
-              (click)="$event.stopPropagation()"
             >
           </div>
 
-          <div
-            class="flex items-center flex-1 min-w-0 ml-3"
-            (click)="handleClickEmail(mail.id)"
-          >
-            <div class="w-8 h-8 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium shrink-0 mr-3">
+          <div class="flex items-center flex-1 min-w-0 ml-3">
+            <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-sm font-medium shrink-0 mr-3">
               {{ mail.data.senderName.charAt(0).toUpperCase() }}
             </div>
 
             <div class="w-48 shrink-0 pr-4">
-              <span class="font-medium text-gray-900 truncate block">
-                {{ mail.data.senderName }}
-              </span>
+              <span class="font-medium text-gray-900 truncate block">{{ mail.data.senderName }}</span>
             </div>
 
             <div class="flex-1 min-w-0 flex items-baseline gap-2">
-              <span class="text-gray-900 truncate">
-                {{ mail.data.subject }}
-              </span>
+              <span class="text-gray-900 truncate">{{ mail.data.subject }}</span>
               <span class="text-gray-500 truncate text-sm hidden md:inline">
                 - {{ mail.data.body | slice:0:60 }}{{ mail.data.body.length > 60 ? '...' : '' }}
               </span>
             </div>
 
             @if (mail.data.priority) {
-              <span
-                class="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium mx-3"
+              <span class="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium mx-3"
                 [class.bg-red-100]="mail.data.priority === 'HIGH' || mail.data.priority === 'URGENT'"
                 [class.bg-yellow-100]="mail.data.priority === 'NORMAL'"
-                [class.text-green-700]="mail.data.priority === 'LOW'"
-              >
+                [class.bg-green-100]="mail.data.priority === 'LOW'">
                 {{ mail.data.priority }}
               </span>
             }
@@ -161,19 +141,15 @@
             </div>
           </div>
 
-          <div class="hidden group-hover:flex items-center gap-1 absolute right-4 bg-white shadow-sm rounded-lg px-1 py-1">
-            <button
-              class="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              (click)="handleDelete(mail.id); $event.stopPropagation()"
-              title="Delete"
-            >
-              <span class="text-gray-600">🗑️</span>
+          <div class="hidden group-hover:flex items-center gap-1 absolute right-4 bg-white shadow-sm border border-gray-100 rounded-lg px-1 py-1">
+            <button (click)="handleDelete(mail.id); $event.stopPropagation()" class="p-2 hover:bg-red-50 rounded-full text-gray-500 hover:text-red-600" title="Delete">
+              🗑️
             </button>
           </div>
         </div>
       } 
       
-      @if (displayedMails().length === 0) {
+      @if (filteredAndSortedMails().length === 0) {
         <div class="flex flex-col items-center justify-center py-20 text-gray-500">
           <span class="text-6xl mb-4">📭</span>
           <h3 class="text-xl font-medium text-gray-700 mb-2">No results found</h3>
