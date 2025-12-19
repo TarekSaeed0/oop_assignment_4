@@ -49,27 +49,27 @@
       <div class="border-b border-gray-200 flex items-start p-2">
         <div class="flex flex-wrap items-center grow space-x-2">
           @for (e of toEmails(); track $index) {
-          <span
-            class="flex items-center bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full mb-1"
-          >
-            {{ e }}
-            <button
-              (click)="removeEmail($index)"
-              class="ml-1 text-green-600 hover:text-green-900 focus:outline-none leading-none"
-              title="Remove email"
+            <span
+              class="flex items-center bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full mb-1"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="3"
-                stroke="currentColor"
-                class="size-3"
+              {{ e }}
+              <button
+                (click)="removeEmail($index)"
+                class="ml-1 text-green-600 hover:text-green-900 focus:outline-none leading-none"
+                title="Remove email"
               >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="3"
+                  stroke="currentColor"
+                  class="size-3"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </span>
           }
 
           <input
@@ -120,17 +120,19 @@
 
       <div class="flex flex-wrap gap-2 p-2">
         @for (attachment of attachments(); track attachment.name) {
-        <app-attachment
-          [attachment]="attachment"
-          [removable]="true"
-          (onRemove)="removeAttachment($event)"
-        />
-        } @if (isUploadingAttachments) {
-        <div
-          class="size-6 animate-spin inline-block border-3 border-gray-300 border-r-transparent rounded-full"
-        ></div>
-        } @if (error) {
-        <div class="text-red-500 text-sm text-center">{{ error }}</div>
+          <app-attachment
+            [attachment]="attachment"
+            [removable]="true"
+            (onRemove)="removeAttachment($event)"
+          />
+        }
+        @if (isUploadingAttachments) {
+          <div
+            class="size-6 animate-spin inline-block border-3 border-gray-300 border-r-transparent rounded-full"
+          ></div>
+        }
+        @if (error) {
+          <div class="text-red-500 text-sm text-center">{{ error }}</div>
         }
       </div>
 
@@ -169,37 +171,40 @@
           (change)="addAttachments($event)"
           class="hidden"
         />
-      <div class="p-2 border-gray-200 flex flex-col justify-start items-start">
-        <div class="w-full">
+        <div class="p-2 border-gray-200 flex flex-col justify-start items-start">
+          <div class="w-full">
             @if (isitme()) {
-            <span class="text-red-600 text-sm font-medium py-2 rounded">
+              <span class="text-red-600 text-sm font-medium py-2 rounded">
                 ❌ You cannot send an email to yourself.
-            </span>
+              </span>
             } @else {
-            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-4">
                 <button
-                (click)="sendEmail()"
-                [disabled]="isSending()"
-                type="button"
-                class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium py-2 px-4 rounded transition duration-150 ease-in-out"
+                  (click)="sendEmail()"
+                  [disabled]="isSending()"
+                  type="button"
+                  class="bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out cursor-pointer"
                 >
-                @if(isSending()) { Sending... } @else { Send }
+                  @if (isSending()) {
+                    Sending...
+                  } @else {
+                    Send
+                  }
                 </button>
 
                 @if (userNotFound()) {
-                <span class="text-red-600 text-sm font-medium">
+                  <span class="text-red-600 text-sm font-medium">
                     ❌ {{ userNotFound() }} email doesn't exist
-                </span>
+                  </span>
                 }
-            </div>
+              </div>
             }
           </div>
 
-
           @if (userNotFound()) {
             <span class="text-red-600 text-sm font-medium">
-                ❌ {{ userNotFound() }} email doesn't exist
-              </span>
+              ❌ {{ userNotFound() }} email doesn't exist
+            </span>
           }
         </div>
         <div class="flex items-center gap-4">
@@ -207,13 +212,16 @@
             (click)="handleSaveDraft()"
             [disabled]="isSending()"
             type="button"
-            class="bg-green-600 hover:bg-green-700 disabled:bg-blue-400 text-white text-sm font-medium py-2 px-4 rounded transition duration-150 ease-in-out"
+            class="bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out cursor-pointer"
           >
-            @if (draftId() == null) {save as draft}
-            @else {update draft}
+            @if (draftId() == null) {
+              save as draft
+            } @else {
+              update draft
+            }
           </button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 </div>
