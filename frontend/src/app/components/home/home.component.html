@@ -63,8 +63,6 @@
         </button>
       </div>
 
-
-
       <div
         id="user-menu"
         class="right-4 top-14 z-50 rounded-full hover:bg-gray-100 active:bg-gray-200 focus:outline-none transition-colors duration-400"
@@ -140,7 +138,7 @@
               [class]="
                 `flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700
               hover:bg-gray-100 transition-colors cursor-pointer
-              ${selectedFolder() == folder.name ? 'bg-gray-300' : ''}`
+              ${selectedFolder() == folder.name ? 'bg-gray-200' : ''}`
               "
             >
               <svg
@@ -181,13 +179,12 @@
           @for (uFolder of userFolders; track uFolder.id) {
             <div
               class="group relative flex items-center pr-2 rounded-lg hover:bg-gray-100 transition-colors"
-              [class.bg-green-100]="selectedFolder() === uFolder.name"
+              [class.bg-gray-200]="selectedFolder() === uFolder.name"
             >
               <button
                 type="button"
                 [title]="uFolder.name"
                 class="w-full flex items-center space-x-3 px-3 py-2 text-gray-700 cursor-pointer text-left focus:outline-none bg-transparent"
-                [class.text-green-700]="selectedFolder() === uFolder.name"
                 (click)="changeFolder(uFolder.name!)"
               >
                 <svg
@@ -210,7 +207,7 @@
               <div class="hidden group-hover:flex items-center gap-1 bg-inherit">
                 <button
                   (click)="handleRenameFolder($event, uFolder)"
-                  class="p-1 hover:bg-gray-200 rounded text-gray-500 hover:text-blue-600 transition-colors"
+                  class="p-1 hover:bg-gray-200 rounded text-gray-500 hover:text-green-600 transition-colors"
                   title="Rename Folder"
                 >
                   <svg
@@ -262,7 +259,6 @@
         <app-inbox [userFolders]="userFolders"></app-inbox>
       } @else if (selectedFolder() == 'Sent') {
         <app-sent [userFolders]="userFolders"></app-sent>
-
       } @else if (selectedFolder() == 'Trash') {
         <app-trashfolder [searchBy]="searchBy()"></app-trashfolder>
       } @else if (selectedFolder() == 'Drafts') {
@@ -281,13 +277,14 @@
     ></app-create-folder-dialog>
   }
   @if (isContactMenuOpen) {
-        <div class="absolute to-50% min-h-screen flex items-center justify-center z-50 overflow-hidden"
-        style="left: 50%; transform: translateX(-50%);">
-    <!-- Contact Component -->
-    <app-contact></app-contact>
-  </div>
-}
-
+    <div
+      class="absolute to-50% min-h-screen flex items-center justify-center z-50 overflow-hidden"
+      style="left: 50%; transform: translateX(-50%)"
+    >
+      <!-- Contact Component -->
+      <app-contact></app-contact>
+    </div>
+  }
 </div>
 
 <app-compose [isComposeOpen]="isComposeOpen" (closeCompose)="isComposeOpen = false"></app-compose>

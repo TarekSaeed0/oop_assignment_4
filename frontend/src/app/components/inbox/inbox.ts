@@ -1,8 +1,8 @@
 import { InboxMail } from './../../types/mail';
-import { Component, effect, inject, OnInit, signal,Input } from '@angular/core';
+import { Component, effect, inject, OnInit, signal, Input } from '@angular/core';
 import { MailService } from '../../services/mail-service';
 import { InboxMailResponce } from '../../types/mail';
-import { MailInbox } from "../mail-inbox/mail-inbox";
+import { MailInbox } from '../mail-inbox/mail-inbox';
 import { AuthenticationService } from '../../services/authentication.service';
 import { HomeComponent } from '../home/home.component';
 import { DatePipe, SlicePipe } from '@angular/common';
@@ -11,52 +11,60 @@ import { MoveToMenuComponent } from '../move-to-menu/move-to-menu';
 
 @Component({
   selector: 'app-inbox',
-  imports: [MailInbox, DatePipe, DatePipe, SlicePipe,MoveToMenuComponent],
+  imports: [MailInbox, DatePipe, DatePipe, SlicePipe, MoveToMenuComponent],
   templateUrl: './inbox.html',
   styleUrl: './inbox.css',
 })
 export class Inbox implements OnInit {
   @Input() userFolders: UserFolder[] = [];
   private userFolderService = inject(UserFolderService);
-  private authServicee= inject(AuthenticationService);
-  mailService = inject(MailService)
+  private authServicee = inject(AuthenticationService);
+  mailService = inject(MailService);
   authService: undefined | AuthenticationService = undefined;
   home: HomeComponent | undefined;
   constructor(authSevice: AuthenticationService, home: HomeComponent) {
-    this.authService = authSevice
+    this.authService = authSevice;
     this.home = home;
     effect(() => {
-      this.handleRefresh()
-    })
+      this.handleRefresh();
+    });
   }
   handleRefresh = () => {
     if (this.currentMailId() == null) {
-      this.mailService.getInbox(this.authService?.user()?.id || 0, this.page(), this.size(),
-        this.home?.searchBy() || "", this.filterBy(), this.hasAttachments(), this.priority(), this.sortBy()
-      ).subscribe({
-        next: (d: any) => {
-          console.log(d);
-          this.inbox.set(d);
-        }
-      })
+      this.mailService
+        .getInbox(
+          this.authService?.user()?.id || 0,
+          this.page(),
+          this.size(),
+          this.home?.searchBy() || '',
+          this.filterBy(),
+          this.hasAttachments(),
+          this.priority(),
+          this.sortBy(),
+        )
+        .subscribe({
+          next: (d: any) => {
+            console.log(d);
+            this.inbox.set(d);
+          },
+        });
     }
-  }
+  };
   hasAttachments = signal<boolean>(false);
-  priority = signal("any");
-  filterBy = signal("any");
-  sortBy = signal("date");
+  priority = signal('any');
+  filterBy = signal('any');
+  sortBy = signal('date');
   handleAttchmentToggle(event: any) {
-    this.hasAttachments.update((h) => !h)
+    this.hasAttachments.update((h) => !h);
   }
   handlePriorityChange($event: any) {
-    this.priority.set($event.target.value)
-
+    this.priority.set($event.target.value);
   }
   handleSortChange($event: any) {
-    this.sortBy.set($event.target.value)
+    this.sortBy.set($event.target.value);
   }
   handleFilterChange($event: any) {
-    this.filterBy.set($event.target.value)
+    this.filterBy.set($event.target.value);
   }
   // handleDelete = (arg0: number) => {
   //   this.mailService.deleteMail(arg0 as number)
@@ -66,80 +74,78 @@ export class Inbox implements OnInit {
   //       }
   //     })
   // }
+  totalPages() {
+    return Math.ceil(this.inbox().length / this.size()) || 1;
+  }
   handleNextPage = () => {
     if (this.hasNextPage()) {
       this.page.update((p) => p + 1);
-      this.handleRefresh()
+      this.handleRefresh();
     }
-  }
+  };
   hasPrevPage() {
-    return this.page() > 1
+    return this.page() > 1;
   }
   hasNextPage() {
-    return this.inbox().length == this.size()
+    return this.inbox().length == this.size();
   }
   handlePrevPage() {
     if (this.hasPrevPage()) {
       this.page.update((p) => p - 1);
-      this.handleRefresh()
+      this.handleRefresh();
     }
   }
-  getPageInfo() {
-  }
-  handleBulkMove() {
-  }
+  getPageInfo() {}
+  handleBulkMove() {}
   handleSelectAll = () => {
     if (this.isAllSelected()) {
-      this.selectedMail.set([])
+      this.selectedMail.set([]);
     } else {
-      this.selectedMail.set(this.inbox().map((e) => e.id))
+      this.selectedMail.set(this.inbox().map((e) => e.id));
     }
-  }
+  };
   isAllSelected() {
-    return (this.selectedMail().length == this.inbox().length) && (this.inbox().length != 0)
+    return this.selectedMail().length == this.inbox().length && this.inbox().length != 0;
   }
 
   handleDelete(id: number) {
     this.mailService.deleteMail(id).subscribe({
       next: () => {
-        this.handleRefresh()
-      }
+        this.handleRefresh();
+      },
     });
   }
   handleBulkDelete() {
-    const mailList = this.selectedMail()
-    this.mailService.bulkDelete(mailList)
-      .subscribe({
-        next: () => {
-          console.log("deleted: " + mailList.toString());
-          this.handleRefresh()
-        }
-      })
+    const mailList = this.selectedMail();
+    this.mailService.bulkDelete(mailList).subscribe({
+      next: () => {
+        console.log('deleted: ' + mailList.toString());
+        this.handleRefresh();
+      },
+    });
     this.selectedMail.set([]);
   }
-  ngOnInit(): void {
-
-  }
-  inbox = signal<InboxMailResponce>([])
+  ngOnInit(): void {}
+  inbox = signal<InboxMailResponce>([]);
   selectMail(id: number) {
-    this.currentMailId.set(id)
+    this.currentMailId.set(id);
   }
   currentMailId = signal<null | number>(null);
   page = signal<number>(1);
   size = signal<number>(10);
   handleClickEmail(id: number) {
-    this.currentMailId.set(id)
+    this.currentMailId.set(id);
   }
-  selectedMail = signal<number[]>([])
+  selectedMail = signal<number[]>([]);
   handleSelectMail = (id: number) => {
     this.selectedMail.update((l) => {
-      if (l.includes(id)) return l.filter((d) => d != id)
+      if (l.includes(id)) return l.filter((d) => d != id);
       else {
-        l.push(id)
-        return l
+        l.push(id);
+        return l;
       }
-    })
-  }
+    });
+  };
 
   handleMoveToFolder(folderName: string) {
     const userId = this.authServicee.user()?.id;
@@ -156,8 +162,7 @@ export class Inbox implements OnInit {
         // Refresh the list
         this.handleRefresh();
       },
-      error: (err) => console.error('Move failed', err)
+      error: (err) => console.error('Move failed', err),
     });
   }
-
 }

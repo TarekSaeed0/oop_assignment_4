@@ -3,7 +3,7 @@ import { MailService } from '../../services/mail-service';
 import { InboxMail } from '../../types/mail';
 import { CommonModule } from '@angular/common';
 import { AuthenticationService } from '../../services/authentication.service';
-import { AttachmentComponent } from "../attachment/attachment.component";
+import { AttachmentComponent } from '../attachment/attachment.component';
 
 @Component({
   selector: 'app-mail-inbox',
@@ -22,49 +22,27 @@ export class MailInbox implements OnInit {
       next: (d: any) => {
         console.log(d);
         this.mail.set(d);
-      }
-    })
+      },
+    });
   }
 
-  currentMailId = input.required<WritableSignal<number | null>>()
-  mail = signal<InboxMail | null>(null)
+  currentMailId = input.required<WritableSignal<number | null>>();
+  mail = signal<InboxMail | null>(null);
   handleBackToInbox = () => {
-    this.currentMailId().set(null)
+    this.currentMailId().set(null);
     this.mail.set(null);
-  }
+  };
 
   onDelete() {
-    this.mailService.deleteMail(this.currentMailId()() as number)
-      .subscribe({
-        next: (value) => {
-          console.log(value);
-
-        }
-      })
+    this.mailService.deleteMail(this.currentMailId()() as number).subscribe({
+      next: (value) => {
+        console.log(value);
+      },
+    });
     this.currentMailId().set(null);
   }
 
   onMoveToFolder() {
     // TODO: Implement move to folder functionality
-  }
-
-  onMarkAsSpam() {
-    // TODO: Implement spam functionality
-  }
-
-  onToggleStar() {
-    // TODO: Implement star functionality
-  }
-
-  onMarkUnread() {
-    // TODO: Implement mark as unread functionality
-  }
-
-  onReply() {
-    // TODO: Implement reply functionality
-  }
-
-  onForward() {
-    // TODO: Implement forward functionality
   }
 }

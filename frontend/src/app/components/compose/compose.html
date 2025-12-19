@@ -183,7 +183,7 @@
                   (click)="sendEmail()"
                   [disabled]="isSending()"
                   type="button"
-                  class="bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out cursor-pointer"
+                  class="bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold py-2 px-4 rounded-md transition duration-150 ease-in-out cursor-pointer"
                 >
                   @if (isSending()) {
                     Sending...
@@ -212,7 +212,7 @@
             (click)="handleSaveDraft()"
             [disabled]="isSending()"
             type="button"
-            class="bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out cursor-pointer"
+            class="bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold py-2 px-4 rounded-md transition duration-150 ease-in-out cursor-pointer"
           >
             @if (draftId() == null) {
               save as draft
