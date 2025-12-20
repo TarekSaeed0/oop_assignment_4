@@ -40,6 +40,7 @@
       <div
         title="contacts"
         class="p-1 rounded-full hover:bg-gray-100 active:bg-gray-200 focus:outline-none transition-colors duration-400"
+        [class.!bg-gray-200]="isContactMenuOpen"
       >
         <button
           id="contact-menu-button"
@@ -65,7 +66,7 @@
 
       <div
         id="user-menu"
-        class="right-4 top-14 z-50 rounded-full hover:bg-gray-100 active:bg-gray-200 focus:outline-none transition-colors duration-400"
+        class="p-1 rounded-full hover:bg-gray-100 active:bg-gray-200 focus:outline-none transition-colors duration-400"
         [class.!bg-gray-200]="isUserMenuOpen"
       >
         <button
@@ -277,13 +278,8 @@
     ></app-create-folder-dialog>
   }
   @if (isContactMenuOpen) {
-    <div
-      class="absolute to-50% min-h-screen flex items-center justify-center z-50 overflow-hidden"
-      style="left: 50%; transform: translateX(-50%)"
-    >
-      <!-- Contact Component -->
-      <app-contact></app-contact>
-    </div>
+    <!-- Contact Component -->
+    <app-contact id="contact-menu"></app-contact>
   }
 </div>
 

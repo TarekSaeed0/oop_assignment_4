@@ -1,6 +1,6 @@
 import { Component, effect, inject, signal, Input, OnInit } from '@angular/core';
 import { MailService } from '../../services/mail-service';
-import { InboxMailResponce, SentMailResponce } from '../../types/mail';
+import { InboxMailResponce, SentMail, SentMailResponce } from '../../types/mail';
 import { MailInbox } from '../mail-inbox/mail-inbox';
 import { AuthenticationService } from '../../services/authentication.service';
 import { MailInSent } from '../mail-in-sent/mail-in-sent';
@@ -159,5 +159,14 @@ export class Sent implements OnInit {
       },
       error: (err) => console.error('Move failed', err),
     });
+  }
+
+  senderInitials(mail: SentMail) {
+    return mail?.data.sender?.name
+      .split(' ')
+      .slice(0, 2)
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase();
   }
 }

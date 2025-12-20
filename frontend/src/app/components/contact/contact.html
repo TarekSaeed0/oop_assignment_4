@@ -1,9 +1,9 @@
-<div class="max-w-6xl mx-auto p-6 space-y-6"
-style="background: #5252521c;
-    border-radius: 20px;">
-
-  <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border">
-
+<div
+  class="max-w-6xl mx-auto p-6 space-y-4 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border border-gray-200 rounded-lg shadow-lg z-30"
+>
+  <div
+    class="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl border border-gray-200"
+  >
     <!-- Search -->
     <div class="relative w-full md:w-1/3">
       <input
@@ -11,7 +11,7 @@ style="background: #5252521c;
         [value]="searchTerm()"
         (input)="onSearchChange($event)"
         placeholder="Search contacts"
-        class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       <span class="absolute left-3 top-2.5 text-gray-400">🔍</span>
     </div>
@@ -20,14 +20,14 @@ style="background: #5252521c;
     <div class="flex gap-2">
       <button
         (click)="toggleSort()"
-        class="px-4 py-2 rounded-lg border text-sm font-medium hover:bg-gray-100"
+        class="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium hover:bg-gray-100"
       >
         {{ isSorted() ? 'Original Order' : 'Sort A–Z' }}
       </button>
 
       <button
         (click)="toggleForm()"
-        class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700"
+        class="bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold py-2 px-4 rounded-md transition duration-150 ease-in-out cursor-pointer"
       >
         {{ showForm() ? 'Close' : 'New Contact' }}
       </button>
@@ -35,8 +35,7 @@ style="background: #5252521c;
   </div>
 
   @if (showForm()) {
-    <div class="bg-white border rounded-xl shadow-sm p-6 space-y-4">
-
+    <div class="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
       <h2 class="text-lg font-semibold text-gray-800">
         {{ isEdit() ? 'Edit Contact' : 'Create Contact' }}
       </h2>
@@ -48,7 +47,7 @@ style="background: #5252521c;
           type="text"
           [value]="name()"
           (input)="name.set($any($event.target).value)"
-          class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+          class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
@@ -60,12 +59,9 @@ style="background: #5252521c;
             type="text"
             [value]="emailInput()"
             (input)="emailInput.set($any($event.target).value)"
-            class="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            class="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
-          <button
-            (click)="addEmail()"
-            class="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200"
-          >
+          <button (click)="addEmail()" class="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
             Add
           </button>
         </div>
@@ -73,12 +69,11 @@ style="background: #5252521c;
 
       <div class="flex flex-wrap gap-2">
         @for (e of emailList(); track $index) {
-          <span class="flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">
+          <span
+            class="flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm"
+          >
             {{ e }}
-            <button
-              (click)="removeEmail($index)"
-              class="text-blue-500 hover:text-red-500"
-            >
+            <button (click)="removeEmail($index)" class="text-blue-500 hover:text-red-500">
               ✕
             </button>
           </span>
@@ -89,7 +84,7 @@ style="background: #5252521c;
       <div class="flex justify-end gap-3 pt-4">
         <button
           (click)="resetForm()"
-          class="px-4 py-2 rounded-lg border hover:bg-gray-100"
+          class="px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-100"
         >
           Reset
         </button>
@@ -104,16 +99,14 @@ style="background: #5252521c;
   }
 
   <!-- Contacts List -->
-  <div class="overflow-hidden bg-white border rounded-xl shadow-sm">
-
-    <div class="p-4 border-b">
+  <div class="overflow-hidden bg-white border border-gray-200 rounded-xl">
+    <div class="p-4 border-b border-gray-200">
       <h3 class="font-semibold text-gray-800">Contacts</h3>
     </div>
 
     <div class="divide-y">
       @for (c of filteredContacts(); track c.contactId) {
-        <div class="flex justify-between items-center p-4 hover:bg-gray-50 ">
-
+        <div class="flex justify-between items-center p-4 hover:bg-gray-50">
           <!-- Contact Info -->
           <div>
             <p class="font-medium text-gray-900">{{ c.name }}</p>
@@ -143,11 +136,8 @@ style="background: #5252521c;
           </div>
         </div>
       } @empty {
-        <div class="p-6 text-center text-gray-500">
-          No contacts found
-        </div>
+        <div class="p-6 text-center text-gray-500">No contacts found</div>
       }
     </div>
   </div>
-
 </div>

@@ -50,8 +50,10 @@
 
   <!-- Sender Info -->
   <div class="mail-meta">
-    <div class="sender-avatar">
-      {{ mail()?.data?.sender?.name?.charAt(0)?.toUpperCase() }}
+    <div
+      class="size-10 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold cursor-pointer"
+    >
+      {{ senderInitials() }}
     </div>
     <div class="sender-details">
       <div class="sender-row">

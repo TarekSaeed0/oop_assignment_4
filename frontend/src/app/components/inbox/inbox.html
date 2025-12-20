@@ -1,7 +1,7 @@
 @if (currentMailId() != null) {
   <app-mail-inbox [currentMailId]="currentMailId"></app-mail-inbox>
 } @else {
-  <div class="flex flex-col min-h-screen bg-gray-50">
+  <div class="flex flex-col bg-gray-50">
     <!-- Toolbar -->
     <div
       class="flex-0 flex flex-col gap-2 sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3"
@@ -218,9 +218,9 @@
           <div class="flex items-center flex-1 min-w-0 ml-3" (click)="handleClickEmail(mail.id)">
             <!-- Sender Avatar -->
             <div
-              class="w-8 h-8 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium shrink-0 mr-3"
+              class="size-8 mr-3 rounded-full bg-green-500 text-white flex items-center justify-center text-sm font-semibold cursor-pointer"
             >
-              {{ mail.data.sender.name.charAt(0).toUpperCase() }}
+              {{ senderInitials(mail) }}
             </div>
 
             <!-- Sender Name -->
@@ -304,7 +304,7 @@
             />
           </svg>
           <h3 class="text-xl font-medium text-gray-700 mb-2">Your inbox is empty</h3>
-          <p class="text-sm">Messages you receive will appear here</p>
+          <p class="text-sm">Mail you receive will appear here</p>
         </div>
       }
     </div>

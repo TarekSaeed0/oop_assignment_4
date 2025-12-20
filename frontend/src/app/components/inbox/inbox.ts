@@ -165,4 +165,13 @@ export class Inbox implements OnInit {
       error: (err) => console.error('Move failed', err),
     });
   }
+
+  senderInitials(mail: InboxMail) {
+    return mail?.data.sender?.name
+      .split(' ')
+      .slice(0, 2)
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase();
+  }
 }

@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -30,7 +31,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class  MailData {
+public class MailData {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -48,6 +49,7 @@ public class  MailData {
 
 	private String subject;
 
+	@Lob
 	private String body;
 
 	@Column(nullable = false)
@@ -64,7 +66,6 @@ public class  MailData {
 	private LocalDateTime sentAt;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "data", cascade = CascadeType.ALL,
-			orphanRemoval = true)
+	@OneToMany(mappedBy = "data", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Mail> mails;
 }

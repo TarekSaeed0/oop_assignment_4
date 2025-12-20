@@ -2,7 +2,20 @@
   <!-- Toolbar -->
   <div class="mail-toolbar">
     <button class="btn btn-icon" (click)="handleBackToSent()" title="Back to sent">
-      <span class="icon">←</span>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="size-5"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+        />
+      </svg>
     </button>
     <div class="toolbar-actions">
       <button class="btn btn-icon" (click)="onDelete()" title="Delete">
@@ -50,8 +63,10 @@
 
   <!-- Sender Info (You) -->
   <div class="mail-meta">
-    <div class="sender-avatar">
-      {{ mail()?.data?.sender?.name?.charAt(0)?.toUpperCase() }}
+    <div
+      class="size-10 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold cursor-pointer"
+    >
+      {{ senderInitials() }}
     </div>
     <div class="sender-details">
       <div class="sender-row">
@@ -72,7 +87,7 @@
     {{ mail()?.data?.body }}
   </div>
 
-  <div class="flex flex-wrap gap-2 p-2">
+  <div class="flex flex-wrap gap-2 px-8">
     @for (attachment of mail()?.data?.attachments; track attachment.name) {
       <app-attachment [attachment]="attachment" [preview]="true" />
     }

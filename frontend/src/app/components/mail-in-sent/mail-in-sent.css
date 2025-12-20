@@ -1,8 +1,6 @@
 .mail-container {
-  max-width: 900px;
   margin: 0 auto;
   background: #fff;
-  min-height: 100vh;
   font-family: 'Google Sans', Roboto, Arial, sans-serif;
 }
 
@@ -63,7 +61,7 @@
 
 /* Header */
 .mail-header {
-  padding: 24px 16px 16px;
+  padding: 24px 32px 0;
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -103,7 +101,7 @@
 /* Sender Meta */
 .mail-meta {
   display: flex;
-  padding: 16px;
+  padding: 16px 32px;
   gap: 16px;
   border-bottom: 1px solid #e0e0e0;
 }
@@ -163,7 +161,7 @@
 
 /* Body */
 .mail-body {
-  padding: 24px 16px;
+  padding: 24px 32px;
   color: #202124;
   font-size: 14px;
   line-height: 1.6;

@@ -28,6 +28,14 @@ export class MailInbox implements OnInit {
 
   currentMailId = input.required<WritableSignal<number | null>>();
   mail = signal<InboxMail | null>(null);
+  senderInitials() {
+    return this.mail()
+      ?.data.sender?.name.split(' ')
+      .slice(0, 2)
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase();
+  }
   handleBackToInbox = () => {
     this.currentMailId().set(null);
     this.mail.set(null);

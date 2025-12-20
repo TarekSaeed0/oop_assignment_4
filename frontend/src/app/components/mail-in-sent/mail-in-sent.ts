@@ -14,6 +14,14 @@ export class MailInSent {
   mailService = inject(MailService);
   authService: undefined | AuthenticationService;
   mail = signal<SentMail | null>(null);
+  senderInitials() {
+    return this.mail()
+      ?.data.sender?.name.split(' ')
+      .slice(0, 2)
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase();
+  }
   constructor(authService: AuthenticationService) {
     this.authService = authService;
   }

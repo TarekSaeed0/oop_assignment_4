@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-white">
+<div class="bg-white">
   @if (selectedMail()) {
     <app-mail-in-trash [mail]="selectedMail()!" (back)="closeMail()"></app-mail-in-trash>
   } @else {
