@@ -94,7 +94,8 @@ public class MailService {
 				.orElseThrow(() -> new RuntimeException("not found"));
 		UserDTO dto =
 				new UserDTO(sender.getId(), sender.getEmail(), sender.getName());
-		MailData mailData = MailData.builder().subject(mailSendDto.getSubject())
+		MailData mailData = MailData.builder()
+				.subject(mailSendDto.getSubject())
 				.body(mailSendDto.getBody())
 				.priority(Priority.valueOf(mailSendDto.getPriority())).sender(sender)
 				.build();
